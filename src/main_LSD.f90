@@ -68,6 +68,9 @@ PROGRAM LiebJADdia
   ! some local variables
   INTEGER(KIND=IKIND)  i1, i2, i3, Inum
 
+  REAL(KIND=RKIND) SugTarE
+  Character*100 str
+
 !  REAL(KIND=RKIND), DIMENSION(:,:), ALLOCATABLE::mat
 
 !  Character*68 Matrixname
@@ -174,7 +177,8 @@ PROGRAM LiebJADdia
         ia(i)=iao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,ia(i)
      ENDDO
-
+     
+     
      ! -----------------------------------------------------------------
      ! start of HubDis loop, not finish yet, just keep HubDis0= HubDis1
      ! -----------------------------------------------------------------
@@ -188,6 +192,8 @@ PROGRAM LiebJADdia
         
         
         DO Seed= ISeed, ISeed+ NSeed -1
+
+           Call GetDirec(Dim, Nx, IWidth, HubDis, RimDis, Seed, str)
 
            IF(IWriteFlag.GE.1) THEN
               PRINT*, "  HubDis=", HubDis, " Seed=", Seed
@@ -252,6 +258,8 @@ PROGRAM LiebJADdia
            
 
            DO Energy= Energy0, Energy1, dEnergy
+           
+   
               ! ----------------------------------------------------------
               ! interface to the JADAMILU code
               ! ----------------------------------------------------------
@@ -262,11 +270,11 @@ PROGRAM LiebJADdia
 
               ! we want the eigenvalues near target sigma=0         
               ! (then, SHIFT need not to be set)       
-              ISEARCH=2
+              ISEARCH=2      
               SIGMA=Energy
-
+                             
               ! elbow space factor for the fill computed during the ILU
-              MEM=20.0
+              MEM=Memory
               ! tolerence for discarded fill
               DROPTOL=1.d-3
 
@@ -278,7 +286,7 @@ PROGRAM LiebJADdia
               ! desired size of the search space
               MADSPACE=maxsp
               ! maximum number of iteration steps
-              ITER=1000
+              ITER=20000
               ! tolerance for the eigenvector residual
               TOL=1.0d-10
 
@@ -302,8 +310,13 @@ PROGRAM LiebJADdia
                    SHIFT, DROPTOL, MEM, ICNTL,&
                    IPRINT, INFO, GAP)
 
+              ! We set a large NEvals to guarantee get all eigenvalues at a certain droptol
+              ! When it get the number of eigenvalues is less than NEvals which we set,
+              ! it will return the actually number INFO(which included one unconverged)
               IF(INFO.NE.0) THEN
-                 NEIG= INFO
+
+                 NEIG= INFO - 1
+
               END IF
 
               CALL PJDCLEANUP   !to be used if you want a new preconditioner in every iteration
@@ -311,31 +324,42 @@ PROGRAM LiebJADdia
               ! ----------------------------------------------------------
               ! write results into files
               ! ---------------------------------------------------------
+             
               
-              DO i=1, NEIG
-                 PRINT*, i, EIGS(i)
-              END DO
+              IF(NEIG==0)THEN
+                 Print*,"Don't find any eigenvalues!"
+              ELSE IF(NEIG.lt.0)THEN
+                 Print*,"Error: may (D)SYGV/(Z)HEGV .... "
+              ELSE
+                 DO i=1, NEIG
+                    PRINT*, i, EIGS(i)
+                 END DO
+              END IF
               
               SELECT CASE(IKeepFlag)
 
               CASE(0)
-                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, IWidth, Energy, HubDis, RimDis, Seed, IErr)
+
+                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+
 !!$                 DO Inum=1, NEVals
-!!$                    CALL WriteOutputEVec( Dim, Nx, Inum, NEVals, Lsize, VECS, VECS_size, &
-!!$                         IWidth, Energy, HubDis, RimDis, Seed, IErr)
+!!$                    CALL WriteOutputEVec( Dim, Nx, Inum, NEIG, Lsize, VECS, VECS_size, &
+!!$                         IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
 !!$                 END DO
 
               CASE(1)           
                  CALL CheckOutput( IWidth, Energy, HubDis, RimDis, Seed, IErr )
                  IF(IErr.EQ.2) GOTO 100
-                 CALL WriteOutputEVal(NEIG, EIGS, IWidth, Energy, HubDis, RimDis, Seed, IErr,IKeepFlag)
+
+                 CALL WriteOutputEVal(NEIG, EIGS, IWidth, Energy, HubDis, RimDis, Seed, IErr, str, IKeepFlag)
                  DO Inum=1,NEVals
                     CALL WriteOutputEVec( Inum, NEIG, Lsize, VECS, VECS_size, &
-                         IWidth, Energy, HubDis, RimDis, Seed, IErr)
+                         IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+
                  END DO
 
-100           END SELECT
-
+100           END SELECT                                  
+             
            END DO !Energy loop
 
         END DO !Seed loop
