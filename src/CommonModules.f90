@@ -154,7 +154,7 @@ CONTAINS
 
     ELSE
        PRINT*,"SetbinsforJad(): EOF error in .inp file, IErr=", IErr
-       #PRINT*, "Not Finish yet, Erro in inout.f90 of SetbinsforJad()" 
+       !PRINT*, "Not Finish yet, Erro in inout.f90 of SetbinsforJad()" 
        STOP
 
     END IF
