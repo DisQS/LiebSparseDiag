@@ -196,7 +196,6 @@ FUNCTION GetFileName(fnamestr,vdata,n)
 !write(*,*) trim(GetFileName('/Output/QH_L(I4)_NL(I1)_NS(I1)_B(F5.3)_C(F4.2)_S(I5).dat',&
 !     (/L_INPUT,NLevels,NSpins,BField,Coul,Seed/),6))
 
-
   IMPLICIT NONE
 
   INTEGER,INTENT(in)         :: n
@@ -317,20 +316,20 @@ SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis
   
   !   WRITE out the input parameter
   IF(Energy.GE.0.0D0) THEN
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A2,A5,I9.9,A7,I7.7,A7,I7.7,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A5,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
           "Eval-", "L", Dim, Nx, &
-          "-M",IWidth, "-p", &
-          "-TarE", NINT(1000000.0D0*ABS(Energy)), &
-          "-HubDis", NINT(10000.0D0*ABS(HubDis)), &
-          "-RimDis", NINT(10000.0D0*ABS(RimDis)), "-",& 
+          "-M",IWidth, &
+          "-TarE", NINT(100.*ABS(Energy)), &
+          "-hD", NINT(100.*ABS(HubDis)), &
+          "-rD", NINT(100.*ABS(RimDis)), "-",& 
           ISeed, ".raw"
   ELSE
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A2,A5,I9.9,A7,I7.7,A7,I7.7,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
           "Eval-","L",Dim, Nx, &
-          "-M",IWidth, "-m",&
-          "-TarE", NINT(1000000.0D0*ABS(Energy)), &
-          "-HubDis",NINT(10000.0D0*ABS(HubDis)), &
-          "-RimDis", NINT(10000.0D0*ABS(RimDis)), "-",&
+          "-M",IWidth, &
+          "-TarE-", NINT(100.*ABS(Energy)), &
+          "-hD",NINT(100.*ABS(HubDis)), &
+          "-rD", NINT(100.*ABS(RimDis)), "-",&
           ISeed, ".raw"
   ENDIF
   
