@@ -6,8 +6,6 @@
 !                  roemer's makeanderson matrix             
 !                           converted from base 0 to base 1 
 ! ----------------------------------------------------------
-!
-! ----------------------------------------------------------
 
 PROGRAM LiebJADdia
 
@@ -69,7 +67,7 @@ PROGRAM LiebJADdia
   INTEGER(KIND=IKIND)  i1, i2, i3, Inum
   
   REAL(KIND=RKIND) SugTarE
-  Character*100 str
+  CHARACTER*100 str
   
   !  REAL(KIND=RKIND), DIMENSION(:,:), ALLOCATABLE::mat
   
@@ -94,7 +92,8 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
   ! inout handling
   ! ----------------------------------------------------------
-  
+
+  PRINT*,"main: calling Input()"
   CALL  Input(IErr)
   IF(IErr.NE.0) THEN
      PRINT*,"main: Input() finds IErr=", IErr
@@ -106,7 +105,9 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
   
   DO IWidth= Width0, Width1, dWidth
-     
+  
+       PRINT*,"main: IWidth=", IWidth
+
      ! ----------------------------------------------------------
      IF(IWriteFlag.GE.0) THEN
         PRINT*, "START@ IWidth=", IWidth
@@ -149,7 +150,8 @@ PROGRAM LiebJADdia
      ! ----------------------------------------------------------
      ! making the Lieb matrix
      ! ----------------------------------------------------------
-     
+
+     PRINT*,"main: calling MakeCompactRowLiebMat()"
      CALL MakeCompactRowLiebMat(Dim, Nx, IWidth, LSize, CSize, iao, jao, ao, nz )
      !output NZ = # of nonzero and diagonal elements
      !output ia must have size of N+1
@@ -181,43 +183,55 @@ PROGRAM LiebJADdia
      ! -----------------------------------------------------------------
        
      DO HubDis= HubDis0, HubDis1, dHubDis
-     
+    
+        PRINT*,"main: HubDis=", HubDis
+
         ! ----------------------------------------------------------
-        ! start of ISeed loop
+        ! start of Energy loop
         ! ----------------------------------------------------------
         
-        DO Seed= ISeed, ISeed+ NSeed -1
+        DO Energy= Energy0, Energy1, dEnergy
+           
+           PRINT*,"main: Energy=", Energy
 
-           Call GetDirec(Dim, Nx, IWidth, HubDis, RimDis, Seed, str)
-
-           IF(IWriteFlag.GE.1) THEN
-              PRINT*, "  HubDis=", HubDis, " Seed=", Seed
-           ENDIF
-
-           CALL SRANDOM(Seed)
-
-           ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
-           a_w(:) = a(:) 
-
-           ! Give the Lieb matrix different onsite potensial
-           DO i=1, IWidth**Dim
-
-              k= (i-1)*(Nx*Dim+1) + 1
-              a_w(ia(k)) = HubDis*(DRANDOM(Seed) - 0.5D0)
+           CALL GetDirec(Dim, Nx, IWidth, HubDis, RimDis, Energy, str)
+           
+           ! ----------------------------------------------------------
+           ! start of ISeed loop
+           ! ----------------------------------------------------------
+           
+           DO Seed= ISeed, ISeed+ NSeed -1
               
-              DO j=2, (Nx*Dim +1)
+              PRINT*,"main: ISeed=", ISeed
 
-                 k = (i-1)*(Nx*Dim+1) + j
-                 a_w(ia(k)) = RimDis*(DRANDOM(Seed) - 0.5D0)
+              IF(IWriteFlag.GE.1) THEN
+                 PRINT*, "  HubDis=", HubDis, " Seed=", Seed
+              ENDIF
+              
+              CALL SRANDOM(Seed)
+              
+              ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
+              a_w(:) = a(:) 
+              
+              ! Give the Lieb matrix different onsite potensial
+              DO i=1, IWidth**Dim
+                 
+                 k= (i-1)*(Nx*Dim+1) + 1
+                 a_w(ia(k)) = HubDis*(DRANDOM(Seed) - 0.5D0)
+                 
+                 DO j=2, (Nx*Dim +1)
+                    
+                    k = (i-1)*(Nx*Dim+1) + j
+                    a_w(ia(k)) = RimDis*(DRANDOM(Seed) - 0.5D0)
+                    
+                 END DO
                  
               END DO
+           
+              !---------------------------------------------------------
+              ! Transform the format of Sparse matrix to Full matrix
+              !--------------------------------------------------------
               
-           END DO
-           
-           !---------------------------------------------------------
-           ! Transform the format of Sparse matrix to Full matrix
-           !--------------------------------------------------------
-           
 !!$           mat(:,:)=0.0D0
 !!$           DO i=1, LSize ! the horizontal of matrix
 !!$
@@ -249,8 +263,6 @@ PROGRAM LiebJADdia
 !!$
 !!$           CLOSE(10)
 
-           DO Energy= Energy0, Energy1, dEnergy
-   
               ! ----------------------------------------------------------
               ! interface to the JADAMILU code
               ! ----------------------------------------------------------
@@ -295,7 +307,7 @@ PROGRAM LiebJADdia
               ! ----------------------------------------------------------
               !  call to PJD that computes eigenvalues & eigenvectors
 
-              IF(IWriteFlag.GE.4) PRINT*,"main: calling PJD()"
+              IF(IWriteFlag.GE.2) PRINT*,"main: calling PJD()"
               CALL PJD(Lsize, a_w, ja, ia, EIGS, RES, VECS, VECS_size, NEIG,&
                    SIGMA, ISEARCH, NINIT, MADSPACE, ITER, TOL,&
                    SHIFT, DROPTOL, MEM, ICNTL,&
@@ -315,9 +327,9 @@ PROGRAM LiebJADdia
               ! ---------------------------------------------------------
               
               IF(NEIG==0)THEN
-                 Print*,"Don't find any eigenvalues!"
-              ELSE IF(NEIG.lt.0)THEN
-                 Print*,"Error: may (D)SYGV/(Z)HEGV .... "
+                 PRINT*,"main: PJD() did not find any eigenvalues!"
+              ELSE IF(NEIG.LT.0)THEN
+                 PRINT*,"main: PJD() reported Error: (D)SYGV/(Z)HEGV .... "
               ELSE
                  DO i=1, NEIG
                     PRINT*, i, EIGS(i)
@@ -343,15 +355,15 @@ PROGRAM LiebJADdia
                  CALL WriteOutputEVal(NEIG, EIGS, &
                       IWidth, Energy, HubDis, RimDis, Seed, IErr, str, IKeepFlag)
                  DO Inum=1,NEVals
-                    CALL WriteOutputEVec( Inum, NEIG, Lsize, VECS, VECS_size, &
+                    CALL WriteOutputEVec(Inum, NEIG, Lsize, VECS, VECS_size, &
                          IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
                  END DO
                  
 100           END SELECT
-             
-           END DO !Energy loop
+                         
+           END DO !Seed loop
            
-        END DO !Seed loop
+        END DO !Energy loop
         
      END DO !HubDis loop
      
