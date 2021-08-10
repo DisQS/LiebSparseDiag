@@ -120,7 +120,7 @@ CONTAINS
        ALLOCATE(TarStore(2*EnR, 2),STAT=IErr)
 
        IF(IErr.NE.0) THEN
-          PRINT*,"CommomModules.f90: Allocate erro, IErr=", IErr
+          PRINT*,"SetbinsforJad(): Allocate error, IErr=", IErr
           STOP
        ENDIF
 
@@ -138,7 +138,7 @@ CONTAINS
        ALLOCATE(TarStore(2*EnR-1, 2),STAT=IErr)
 
        IF(IErr.NE.0) THEN
-          PRINT*,"CommonModules.f90: Allocate erro, IErr=", IErr
+          PRINT*,"SetbinsforJad(): Allocate error, IErr=", IErr
           STOP
        END IF
 
@@ -153,7 +153,8 @@ CONTAINS
        END DO
 
     ELSE
-       PRINT*, "Not Finish yet, Erro in inout.f90 of SetbinsforJad()" 
+       PRINT*,"SetbinsforJad(): EOF error in .inp file, IErr=", IErr
+       #PRINT*, "Not Finish yet, Erro in inout.f90 of SetbinsforJad()" 
        STOP
 
     END IF
