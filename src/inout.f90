@@ -451,30 +451,39 @@ END SUBROUTINE WriteOutputEVec
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Create Folder !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SUBROUTINE GetDirec(Dim, Nx, Width, HubDis, RimDis, Seed, str)
+SUBROUTINE GetDirec(Dim, Nx, Width, HubDis, RimDis, Energy, str)
+  USE MyNumbers
 
   INTEGER*4 Dim, Nx, Width, Seed
-  REAL*8 HubDis, RimDis
+  REAL*8 HubDis, RimDis, Energy
   CHARACTER(len=100) str
   CHARACTER(len=10) fid1, fid2, fid3, fid4, fid5, fid6
   LOGICAL*4 ierr1
 
+  PRINT*, "GetDirec(): ", Dim, Nx, Width, HubDis, RimDis, Energy
+
   WRITE(fid1,'(I1)') Dim; fid1=TRIM(ADJUSTL(fid1))
   WRITE(fid2,'(I1)') Nx; fid2=TRIM(ADJUSTL(fid2))
   WRITE(fid3,'(I3)') Width; fid3=TRIM(ADJUSTL(fid3))
-  WRITE(fid4,'(f8.4)') HubDis; fid4=TRIM(ADJUSTL(fid4))
-  WRITE(fid5,'(f8.4)') RimDis; fid5=TRIM(ADJUSTL(fid5))
-  WRITE(fid6,'(I4.4)') Seed
+  WRITE(fid4,'(I6.6)') NINT(HubDis*100.); fid4=TRIM(ADJUSTL(fid4))
+  WRITE(fid5,'(I6.6)') NINT(RimDis*100.); fid5=TRIM(ADJUSTL(fid5))
+  !WRITE(fid6,'(I4.4)') Seed
+  WRITE(fid6,'(I6.6)') NINT(ABS(Energy)*100.); fid6=TRIM(ADJUSTL(fid6))
   
-  str='L'//TRIM(fid1)//TRIM(fid2)//'_M'//TRIM(fid3)//'_hD'//TRIM(fid4) &
-       //'_rD'//TRIM(fid5)//"_"//TRIM(fid6)//'_DATA'
+  IF(Energy.GE.ZERO) THEN
+     str='L'//TRIM(fid1)//TRIM(fid2)//'_M'//TRIM(fid3)//'_hD'//TRIM(fid4) &
+          //'_rD'//TRIM(fid5)//"_E"//TRIM(fid6)!//'_DATA'
+  ELSe
+     str='L'//TRIM(fid1)//TRIM(fid2)//'_M'//TRIM(fid3)//'_hD'//TRIM(fid4) &
+          //'_rD'//TRIM(fid5)//"_E-"//TRIM(fid6)!//'_DATA'
+  END IF
 
 !  Write(str,'(A1,I1,I1,A2,I3.1,A7,f6.1,A7,f6.1,A6)') &
 !       "L", Dim, Nx, "_M", Width, "_HubDis", HubDis, &
 !       "_RimDis", RimDis, "_.DATA"
 
 !!$  PRINT*,str
-  PRINT*, "GetDirec(): checking for ", str
+  PRINT*, "GetDirec(): checking for ", str, Dim, Nx, Width, HubDis, RimDis, Energy
 
   INQUIRE(file=TRIM(ADJUSTL(str)), Exist=ierr1)
   IF(ierr1)THEN
@@ -483,7 +492,7 @@ SUBROUTINE GetDirec(Dim, Nx, Width, HubDis, RimDis, Seed, str)
   ELSE
      PRINT*,"GetDirec(): directory doesn't exist and is NOW being createed!"
      WRITE(*,'(/)')
-     CALL System("mkdir "//TRIM(ADJUSTL(str)) )
+     CALL System("mkdir -p "//TRIM(ADJUSTL(str)) )
   END IF
   
   RETURN
