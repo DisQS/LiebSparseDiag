@@ -61,52 +61,52 @@ PROGRAM LiebJADdia
        RES,&   !computed residues: |Ax-EIGS x|
        VECS, &    !computed eigenvectors
        a,a_w
-
+  
   INTEGER(KIND=IKIND), DIMENSION(:), ALLOCATABLE:: &
        ia, ja
-
+  
   ! some local variables
   INTEGER(KIND=IKIND)  i1, i2, i3, Inum
-
+  
   REAL(KIND=RKIND) SugTarE
   Character*100 str
-
-!  REAL(KIND=RKIND), DIMENSION(:,:), ALLOCATABLE::mat
-
-!  Character*68 Matrixname
+  
+  !  REAL(KIND=RKIND), DIMENSION(:,:), ALLOCATABLE::mat
+  
+  !  Character*68 Matrixname
 
 !!$  ! Setting Target Energy
 !!$
 !!$  INTEGER(KIND=IKIND) L
 !!$
 !!$  INTEGER(KIND=IKIND), Dimension(:,:), ALLOCATABLE:: TarStore
-
+  
   ! ----------------------------------------------------------
   ! start of main code
   ! ----------------------------------------------------------
-
+  
   ! ----------------------------------------------------------
   ! protocol feature
   ! ----------------------------------------------------------
-
+  
   PRINT*,"LiebSparseDiag ", RStr, DStr, AStr 
-
+  
   ! ----------------------------------------------------------
   ! inout handling
   ! ----------------------------------------------------------
-
+  
   CALL  Input(IErr)
   IF(IErr.NE.0) THEN
      PRINT*,"main: Input() finds IErr=", IErr
      STOP
   ENDIF
-
+  
   ! ----------------------------------------------------------
   ! start of main IWidth loop
   ! ----------------------------------------------------------
-
+  
   DO IWidth= Width0, Width1, dWidth
-
+     
      ! ----------------------------------------------------------
      IF(IWriteFlag.GE.0) THEN
         PRINT*, "START@ IWidth=", IWidth
@@ -118,7 +118,7 @@ PROGRAM LiebJADdia
      
      LSize     = (Dim*Nx+1)*(IWidth**Dim)
      VECS_size = Lsize*(3*maxsp+NEVals+1)+4*maxsp*maxsp
-     CSize=(2*Dim*Nx+4)*(IWidth**Dim) 
+     CSize     = (2*Dim*Nx+4)*(IWidth**Dim) 
      
      IF(IWriteFlag.GE.2) THEN
         PRINT*,"main: cube is ",Lsize," by ",Lsize
@@ -146,7 +146,6 @@ PROGRAM LiebJADdia
         STOP
      ENDIF
      
-
      ! ----------------------------------------------------------
      ! making the Lieb matrix
      ! ----------------------------------------------------------
@@ -154,7 +153,6 @@ PROGRAM LiebJADdia
      CALL MakeCompactRowLiebMat(Dim, Nx, IWidth, LSize, CSize, iao, jao, ao, nz )
      !output NZ = # of nonzero and diagonal elements
      !output ia must have size of N+1
-
 
      IF(IWriteFlag.GE.4) PRINT*,&
           "main: There are",nz,"nonzero elements of array a()"
@@ -167,29 +165,26 @@ PROGRAM LiebJADdia
         ja(i)=jao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,ja(i)
      ENDDO
-
+     
      DO i=1,nz
         a(i)=ao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,a(i)
      ENDDO
-
+     
      DO i=1,Lsize+1
         ia(i)=iao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,ia(i)
      ENDDO
      
-     
      ! -----------------------------------------------------------------
-     ! start of HubDis loop, not finish yet, just keep HubDis0= HubDis1
+     ! start of HubDis loop, not finished yet, just keep HubDis0= HubDis1
      ! -----------------------------------------------------------------
        
      DO HubDis= HubDis0, HubDis1, dHubDis
-        
      
         ! ----------------------------------------------------------
         ! start of ISeed loop
         ! ----------------------------------------------------------
-        
         
         DO Seed= ISeed, ISeed+ NSeed -1
 
@@ -198,7 +193,6 @@ PROGRAM LiebJADdia
            IF(IWriteFlag.GE.1) THEN
               PRINT*, "  HubDis=", HubDis, " Seed=", Seed
            ENDIF
-
 
            CALL SRANDOM(Seed)
 
@@ -210,17 +204,16 @@ PROGRAM LiebJADdia
 
               k= (i-1)*(Nx*Dim+1) + 1
               a_w(ia(k)) = HubDis*(DRANDOM(Seed) - 0.5D0)
-
-
+              
               DO j=2, (Nx*Dim +1)
 
                  k = (i-1)*(Nx*Dim+1) + j
                  a_w(ia(k)) = RimDis*(DRANDOM(Seed) - 0.5D0)
-
+                 
               END DO
-
+              
            END DO
-
+           
            !---------------------------------------------------------
            ! Transform the format of Sparse matrix to Full matrix
            !--------------------------------------------------------
@@ -255,10 +248,8 @@ PROGRAM LiebJADdia
 !!$102        FORMAT(1x,F15.6\)
 !!$
 !!$           CLOSE(10)
-           
 
            DO Energy= Energy0, Energy1, dEnergy
-           
    
               ! ----------------------------------------------------------
               ! interface to the JADAMILU code
@@ -289,7 +280,7 @@ PROGRAM LiebJADdia
               ITER=20000
               ! tolerance for the eigenvector residual
               TOL=1.0d-10
-
+              
               ! additional parameters set to default
               ICNTL(1)=0
               ICNTL(2)=0    ! switch ON for ADAPTIVE precon =0
@@ -314,9 +305,7 @@ PROGRAM LiebJADdia
               ! When it get the number of eigenvalues is less than NEvals which we set,
               ! it will return the actually number INFO(which included one unconverged)
               IF(INFO.NE.0) THEN
-
                  NEIG= INFO - 1
-
               END IF
 
               CALL PJDCLEANUP   !to be used if you want a new preconditioner in every iteration
@@ -324,7 +313,6 @@ PROGRAM LiebJADdia
               ! ----------------------------------------------------------
               ! write results into files
               ! ---------------------------------------------------------
-             
               
               IF(NEIG==0)THEN
                  Print*,"Don't find any eigenvalues!"
@@ -337,10 +325,11 @@ PROGRAM LiebJADdia
               END IF
               
               SELECT CASE(IKeepFlag)
-
+                 
               CASE(0)
 
-                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
+                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
 
 !!$                 DO Inum=1, NEVals
 !!$                    CALL WriteOutputEVec( Dim, Nx, Inum, NEIG, Lsize, VECS, VECS_size, &
@@ -350,24 +339,21 @@ PROGRAM LiebJADdia
               CASE(1)           
                  CALL CheckOutput( IWidth, Energy, HubDis, RimDis, Seed, IErr )
                  IF(IErr.EQ.2) GOTO 100
-
-                 CALL WriteOutputEVal(NEIG, EIGS, IWidth, Energy, HubDis, RimDis, Seed, IErr, str, IKeepFlag)
+                 
+                 CALL WriteOutputEVal(NEIG, EIGS, &
+                      IWidth, Energy, HubDis, RimDis, Seed, IErr, str, IKeepFlag)
                  DO Inum=1,NEVals
                     CALL WriteOutputEVec( Inum, NEIG, Lsize, VECS, VECS_size, &
                          IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-
                  END DO
-
-100           END SELECT                                  
+                 
+100           END SELECT
              
            END DO !Energy loop
-
+           
         END DO !Seed loop
-
+        
      END DO !HubDis loop
-     
-
-
      
      ! ----------------------------------------------------------
      ! DEALLOCATE memory
