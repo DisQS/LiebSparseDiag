@@ -66,9 +66,9 @@
 
 !!--------------------------------------------------------------------
 MODULE CConstants
-  CHARACTER*18, PARAMETER :: RStr= "$Revision: 1.3 $ "
-  CHARACTER*30, PARAMETER :: DStr= "$Date: 2007/09/25 20:45:08 $ "
-  CHARACTER*16, PARAMETER :: AStr= "$Author: phrfar $ "
+  CHARACTER*18, PARAMETER :: RStr= "$Revision: 1.0 $ "
+  CHARACTER*30, PARAMETER :: DStr= "$Date: 2021/08 $ "
+  CHARACTER*16, PARAMETER :: AStr= "$Author: phsht $ "
 END MODULE CConstants
 
 !! MAXGamma needs to be equal to MAXWidth, as we need to find ALL
