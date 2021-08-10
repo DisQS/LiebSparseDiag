@@ -64,7 +64,7 @@ SUBROUTINE Input(IErr)
   IErr = 0
   ILine= 0
   
-  OPEN(UNIT= IChInp, ERR=120, FILE= "LSD.inp",STATUS= 'OLD')
+  OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
 
   ILine= ILine+1
   READ(IChInp,10,ERR=20) ISeed
@@ -165,7 +165,7 @@ SUBROUTINE Input(IErr)
      PRINT*,"HubDis0      = ", HubDis0
      PRINT*,"HubDis1      = ", HubDis1
      PRINT*,"dHubDis      = ", dHubDis
-     Print*,"RimDis       = ", RimDis
+     PRINT*,"RimDis       = ", RimDis
      PRINT*,"Energy0      = ", Energy0
      PRINT*,"Energy1      = ", Energy1
      PRINT*,"dEnergy      = ", dEnergy
@@ -340,7 +340,7 @@ SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis
   
 !!$  OPEN(UNIT= IChEVal, ERR= 10, STATUS='UNKNOWN', FILE=Trim(str)//"/"//FileName)  
   
-  OPEN(UNIT= IChEVal, ERR= 10, STATUS='UNKNOWN', FILE= Trim(AdjustL(str))//"/"//FileName)
+  OPEN(UNIT= IChEVal, ERR= 10, STATUS='UNKNOWN', FILE= TRIM(ADJUSTL(str))//"/"//FileName)
   
   IF(NEVals .GT. 0)THEN
      DO i=1,NEVals
@@ -417,7 +417,7 @@ SUBROUTINE WriteOutputEVec( Dim, Nx, Inum, NEVals, Lsize, VECS, VECS_size, &
           Seed, ".raw"
   ENDIF
 
-  print*,'evector file ',FileName
+  PRINT*,'evector file ',FileName
 
   OPEN(UNIT= IChEVec, ERR= 40, STATUS= 'UNKNOWN', FILE=FileName)
 
@@ -451,43 +451,42 @@ END SUBROUTINE WriteOutputEVec
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Create Folder !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Subroutine GetDirec(Dim, Nx, Width, HubDis, RimDis, Seed, str)
+SUBROUTINE GetDirec(Dim, Nx, Width, HubDis, RimDis, Seed, str)
 
-  Integer*4 Dim, Nx, Width, Seed
-  Real*8 HubDis, RimDis
-  Character(len=100) str
-  Character(len=10) fid1, fid2, fid3, fid4, fid5, fid6
-  Logical*4 ierr1
+  INTEGER*4 Dim, Nx, Width, Seed
+  REAL*8 HubDis, RimDis
+  CHARACTER(len=100) str
+  CHARACTER(len=10) fid1, fid2, fid3, fid4, fid5, fid6
+  LOGICAL*4 ierr1
 
-  write(fid1,'(I1)') Dim; fid1=Trim(AdjustL(fid1))
-  write(fid2,'(I1)') Nx; fid2=Trim(AdjustL(fid2))
-  write(fid3,'(I3)') Width; fid3=Trim(AdjustL(fid3))
-  write(fid4,'(f8.4)') HubDis; fid4=Trim(AdjustL(fid4))
-  write(fid5,'(f8.4)') RimDis; fid5=Trim(AdjustL(fid5))
-  write(fid6,'(I4)') Seed
+  WRITE(fid1,'(I1)') Dim; fid1=TRIM(ADJUSTL(fid1))
+  WRITE(fid2,'(I1)') Nx; fid2=TRIM(ADJUSTL(fid2))
+  WRITE(fid3,'(I3)') Width; fid3=TRIM(ADJUSTL(fid3))
+  WRITE(fid4,'(f8.4)') HubDis; fid4=TRIM(ADJUSTL(fid4))
+  WRITE(fid5,'(f8.4)') RimDis; fid5=TRIM(ADJUSTL(fid5))
+  WRITE(fid6,'(I4.4)') Seed
   
-
-  str='L'//Trim(fid1)//Trim(fid2)//'_M'//Trim(fid3)//'_HubDis'//Trim(fid4) &
-       //'_RimDis'//Trim(fid5)//"_"//Trim(fid6)//'_.DATA'
+  str='L'//TRIM(fid1)//TRIM(fid2)//'_M'//TRIM(fid3)//'_hD'//TRIM(fid4) &
+       //'_rD'//TRIM(fid5)//"_"//TRIM(fid6)//'_DATA'
 
 !  Write(str,'(A1,I1,I1,A2,I3.1,A7,f6.1,A7,f6.1,A6)') &
 !       "L", Dim, Nx, "_M", Width, "_HubDis", HubDis, &
 !       "_RimDis", RimDis, "_.DATA"
 
 !!$  PRINT*,str
-  Print*, str
+  PRINT*, "GetDirec(): checking for ", str
 
-  Inquire(file=Trim(AdjustL(str)), Exist=ierr1)
-  If(ierr1)Then
-     Print*,"The directory have existed and don't need to be created"
-     Write(*,'(/)')
-  Else
-     Print*,"The directory don't exist and create it"
-     Write(*,'(/)')
-     call System("mkdir "//Trim(AdjustL(str)) )
-  End if
+  INQUIRE(file=TRIM(ADJUSTL(str)), Exist=ierr1)
+  IF(ierr1)THEN
+     PRINT*,"GetDirec(): directory exists and doesn't need to be created!"
+     WRITE(*,'(/)')
+  ELSE
+     PRINT*,"GetDirec(): directory doesn't exist and is NOW being createed!"
+     WRITE(*,'(/)')
+     CALL System("mkdir "//TRIM(ADJUSTL(str)) )
+  END IF
   
   RETURN
   
-END Subroutine GetDirec
+END SUBROUTINE GetDirec
 
