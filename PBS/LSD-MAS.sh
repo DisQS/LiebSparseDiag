@@ -20,10 +20,10 @@ jobdir=$currdir
 
 binarydir=$HOME/Projects/LiebSparseDiag/EXE
 
-for disorder in 10.0 8.0 6.0 4.0 2.0
+for disorder in 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0
 do
 
-energy=$disorder
+energy=`echo "$disorder + 6.0"| bc`
 
 echo "--- hDis=" $disorder ", Min_Eng=" $energy
 
