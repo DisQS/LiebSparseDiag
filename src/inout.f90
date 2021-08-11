@@ -144,7 +144,6 @@ SUBROUTINE Input(IErr)
   READ(IChInp,10,ERR=20) NEVals
   !PRINT*,"NEVals      = ",NEVals
   
-  
 10 FORMAT(16X,I15.1)
   ! 10	FORMAT("IMAXIteration= ",I15.1)
 15 FORMAT(16X,F18.9)
@@ -235,7 +234,7 @@ END FUNCTION GetFileName
 !
 ! IErr	error code
 
-SUBROUTINE CheckOutput( IWidth, Energy, HubDis, RimDis, ISeed, IErr )
+SUBROUTINE CheckOutput( Dim, Nx, IWidth, Energy, HubDis, RimDis, ISeed, str, IErr )
 
   USE MyNumbers 
   USE IChannels
@@ -243,76 +242,12 @@ SUBROUTINE CheckOutput( IWidth, Energy, HubDis, RimDis, ISeed, IErr )
 !  USE IPara
 
   
-  INTEGER(KIND=IKIND) IWidth, IErr, ERR, Iseed
+  INTEGER(KIND=IKIND) Dim, Nx, IWidth, IErr, ERR, Iseed
   REAL(KIND=RKIND) HubDis, RimDis, Energy
-  
-  CHARACTER*100 FileName
-  
-  !PRINT*,"DBG: CheckOutput()"
-  
-  IErr= 0
-  
-  !   WRITE out the input parameter
-  IF( Energy .GE. 0.0D0) THEN
-     WRITE(FileName, '(A4,A2,I4.4,A5,I7.7,A7,I4.4,A7,I4.4,A1,I4,A4)') &
-          "Eval-M",IWidth,  &
-          "-TarE", NINT(10000.0D0*ABS(Energy)), &
-          "-HubDis", NINT(100.0D0*ABS(HubDis)), &
-          "-RimDis", NINT(100.0D0*ABS(RimDis)), "-",& 
-          !Number, "-", &
-          ISeed, ".raw"
-  ELSE
-     WRITE(FileName, '(A4,A2,I4.4,A2,A5,I7.7,A7,I4.4,A7,I4.4,A1,I4,A4)') &
-          "Eval","-M",IWidth, "-m", &
-          "-TarE", NINT(10000.0D0*ABS(Energy)), &
-          "-HubDis",NINT(100.0D0*ABS(HubDis)), "-", &
-          "-RimDis", NINT(100.0D0*ABS(RimDis)), "-",&
-          ISeed, ".raw"
-  ENDIF
-  
-  OPEN(UNIT= IChOut, ERR= 10, STATUS= 'NEW', FILE=FileName)
-  
-  IErr= 0
-  
-20 CLOSE(UNIT= IChOut, ERR= 100)
-  
-  RETURN
-  
-10 WRITE(*,15) FileName
-15 FORMAT(" CheckOutput(): ", A28,&
-        " exists -- skipped!")
-  
-  IErr= 2
-  GOTO 20
-  
-  !  ERR in CLOSE detected
-100 &
-  PRINT*,"CheckOutput(): ERR in CLOSE()"
-  IErr= 1
-  RETURN
-  
-END SUBROUTINE CheckOutput
-
-
-!--------------------------------------------------------------------
-! WriteOutputEVal:
-!
-! IErr	error code
-
-SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis, ISeed, str, IErr)
-
-
-  USE MyNumbers
-  USE IChannels
-!  USE DPara
-!  USE IPara
-
-  INTEGER(KIND=IKIND) Dim, Nx
-  INTEGER(KIND=IKIND) IWidth, IErr, ERR, NEVals, Iseed, i
-  REAL(KIND=RKIND) HubDis, RimDis, Energy
-  REAL(KIND=RKIND) EIGS(NEVals)
   
   CHARACTER*100 FileName, str
+  
+  PRINT*,"DBG: CheckOutput()"
   
   IErr= 0
   
@@ -335,9 +270,73 @@ SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis
           ISeed, ".raw"
   ENDIF
   
-  !        IF(IWriteFlag .GE. 2) THEN
-  PRINT*, "eVAL file    ", FileName
-  !        ENDIF
+  OPEN(UNIT= IChOut, ERR= 10, STATUS= 'NEW', FILE= TRIM(ADJUSTL(str))//"/"//FileName)
+  
+  IErr= 0
+  
+20 CLOSE(UNIT= IChOut, ERR= 100)
+  
+  RETURN
+  
+10 PRINT*, "CheckOutput(): ", TRIM(FileName)
+  PRINT*,  "CheckOutput(): exists -- skipped!"
+  IErr= 2
+  GOTO 20
+  
+  !  ERR in CLOSE detected
+100 &
+  PRINT*,"CheckOutput(): ERR in CLOSE()"
+  IErr= 1
+  RETURN
+  
+END SUBROUTINE CheckOutput
+
+
+!--------------------------------------------------------------------
+! WriteOutputEVal:
+!
+! IErr	error code
+
+SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis, ISeed, str, IErr)
+
+  USE MyNumbers
+  USE IChannels
+!  USE DPara
+!  USE IPara
+
+  INTEGER(KIND=IKIND) Dim, Nx
+  INTEGER(KIND=IKIND) IWidth, IErr, ERR, NEVals, Iseed, i
+  REAL(KIND=RKIND) HubDis, RimDis, Energy
+  REAL(KIND=RKIND) EIGS(NEVals)
+  
+  CHARACTER*100 FileName, str
+
+  !PRINT*,"DBG: WriteOutputEVal()"
+  
+  IErr= 0
+  
+  !   WRITE out the input parameter
+  IF(Energy.GE.0.0D0) THEN
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A5,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
+          "Eval-", "L", Dim, Nx, &
+          "-M",IWidth, &
+          "-TarE", NINT(100.*ABS(Energy)), &
+          "-hD", NINT(100.*ABS(HubDis)), &
+          "-rD", NINT(100.*ABS(RimDis)), "-",& 
+          ISeed, ".raw"
+  ELSE
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
+          "Eval-","L",Dim, Nx, &
+          "-M",IWidth, &
+          "-TarE-", NINT(100.*ABS(Energy)), &
+          "-hD",NINT(100.*ABS(HubDis)), &
+          "-rD", NINT(100.*ABS(RimDis)), "-",&
+          ISeed, ".raw"
+  ENDIF
+  
+!!$  IF(IWriteFlag.GE.2) THEN
+!!$     PRINT*, "WriteOutputEVal(): EVal filename=", FileName
+!!$  ENDIF
   
 !!$  OPEN(UNIT= IChEVal, ERR= 10, STATUS='UNKNOWN', FILE=Trim(str)//"/"//FileName)  
   
