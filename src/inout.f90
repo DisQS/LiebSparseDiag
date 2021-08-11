@@ -64,7 +64,9 @@ SUBROUTINE Input(IErr)
   IErr = 0
   ILine= 0
   
-  OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
+  !OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
+  OPEN(UNIT= IChInp, ERR=120, FILE= "/dev/stdin",STATUS= 'OLD')
+  !OPEN(UNIT= IChInp, ERR=120, ACCESS= "stream",STATUS= 'OLD')
 
   ILine= ILine+1
   READ(IChInp,10,ERR=20) ISeed
