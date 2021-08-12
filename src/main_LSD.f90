@@ -287,7 +287,7 @@ PROGRAM LiebJADdia
               SIGMA=Energy
                              
               ! elbow space factor for the fill computed during the ILU
-              MEM=Memory
+              MEM=200.0 !Memory
               ! tolerence for discarded fill
               DROPTOL=1.d-3
 
