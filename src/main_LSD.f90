@@ -207,6 +207,16 @@ PROGRAM LiebJADdia
               IF(IWriteFlag.GE.1) THEN
                  PRINT*, "  HubDis=", HubDis, " Seed=", Seed
               ENDIF
+
+              ! ----------------------------------------------------------
+              ! CHECK if same exists and can be overwritten
+              ! ----------------------------------------------------------
+
+              SELECT CASE(IKeepFlag)
+              CASE(1)
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed, str, IErr )
+                 IF(IErr.EQ.2) CYCLE
+              END SELECT
               
               CALL SRANDOM(Seed)
               
@@ -277,7 +287,7 @@ PROGRAM LiebJADdia
               SIGMA=Energy
                              
               ! elbow space factor for the fill computed during the ILU
-              MEM=Memory
+              MEM=200.0 !Memory
               ! tolerence for discarded fill
               DROPTOL=1.d-3
 
@@ -329,37 +339,28 @@ PROGRAM LiebJADdia
               IF(NEIG==0)THEN
                  PRINT*,"main: PJD() did not find any eigenvalues!"
               ELSE IF(NEIG.LT.0)THEN
-                 PRINT*,"main: PJD() reported Error: (D)SYGV/(Z)HEGV .... "
+                 PRINT*,"main: PJD() reported ERROR: #", NEIG
               ELSE
-                 DO i=1, NEIG
-                    PRINT*, i, EIGS(i)
-                 END DO
-              END IF
-              
-              SELECT CASE(IKeepFlag)
-                 
-              CASE(0)
-
+!!$                 DO i=1, NEIG
+!!$                    PRINT*, i, EIGS(i)
+!!$                 END DO
+                 PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
                       IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-
-!!$                 DO Inum=1, NEVals
-!!$                    CALL WriteOutputEVec( Dim, Nx, Inum, NEIG, Lsize, VECS, VECS_size, &
-!!$                         IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-!!$                 END DO
-
-              CASE(1)           
-                 CALL CheckOutput( IWidth, Energy, HubDis, RimDis, Seed, IErr )
-                 IF(IErr.EQ.2) GOTO 100
-                 
-                 CALL WriteOutputEVal(NEIG, EIGS, &
-                      IWidth, Energy, HubDis, RimDis, Seed, IErr, str, IKeepFlag)
-                 DO Inum=1,NEVals
-                    CALL WriteOutputEVec(Inum, NEIG, Lsize, VECS, VECS_size, &
-                         IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-                 END DO
-                 
-100           END SELECT
+              END IF
+              
+!!$              SELECT CASE(IKeepFlag)
+!!$              CASE(0)
+!!$                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
+!!$                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+!!$              CASE(1)          
+!!$                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed, str, IErr )
+!!$                 IF(IErr.EQ.2) GOTO 100
+!!$
+!!$                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
+!!$                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+!!$                 
+!!$100           END SELECT
                          
            END DO !Seed loop
            
