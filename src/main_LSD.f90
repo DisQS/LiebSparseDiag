@@ -119,7 +119,7 @@ PROGRAM LiebJADdia
      
      LSize     = (Dim*Nx+1)*(IWidth**Dim)
      VECS_size = Lsize*(3*maxsp+NEVals+1)+4*maxsp*maxsp
-     CSize     = (2*Dim*Nx+4)*(IWidth**Dim) 
+     CSize     = (2*Dim*Nx+Dim+1)*(IWidth**Dim) 
      
      IF(IWriteFlag.GE.2) THEN
         PRINT*,"main: cube is ",Lsize," by ",Lsize
