@@ -64,7 +64,7 @@ SUBROUTINE Input(IErr)
   IErr = 0
   ILine= 0
   
-  !OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
+!  OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
   OPEN(UNIT= IChInp, ERR=120, FILE= "/dev/stdin",STATUS= 'OLD')
   !OPEN(UNIT= IChInp, ERR=120, ACCESS= "stream",STATUS= 'OLD')
 
@@ -73,16 +73,16 @@ SUBROUTINE Input(IErr)
   !PRINT*,"ISeed        = ",ISeed
 
   ILine= ILine+1
-  READ(IChInp,10,ERR=20) NSeed
-  !PRINT*,"NSeed        = ",NSeed
+  READ(IChInp,10,ERR=20) NConfig
+  !PRINT*,"NConfig      = ",NConfig
   
   ILine= ILine+1
   READ(IChInp,10,ERR=20) Dim
-  !PRINT*,"Dim         = ",Dim
+  !PRINT*,"Dim          = ",Dim
 
   ILine= ILine+1
   READ(IChInp,10,ERR=20) Nx
-  !PRINT*,"Nx          = ",Nx
+  !PRINT*,"Nx           = ",Nx
   
   ILine= ILine+1
   READ(IChInp,10,ERR=20) IBCFlag
@@ -153,7 +153,7 @@ SUBROUTINE Input(IErr)
   
   IF(IWriteFlag.GE.2) THEN
      PRINT*,"ISeed        = ", ISeed
-     PRINT*,"NSeed        = ", NSeed
+     PRINT*,"NConfig      = ", NConfig
      PRINT*,"Dim          = ", Dim
      PRINT*,"Nx           = ", Nx
      PRINT*,"IBCFlag      = ", IBCFlag
