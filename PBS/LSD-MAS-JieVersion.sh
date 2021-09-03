@@ -2,9 +2,9 @@
 
 # settings from input
 
-size=${1:-20}
+size=${1:-10}
 seed=${2:-1}
-config=${3:-10}
+config=${3:-100}
 keep=${4:-1}
 
 echo "LSD: making for M=" $size "with starting seed=" $seed "and" $config "samples"
@@ -21,35 +21,52 @@ jobdir=$currdir
 binarydir=$currdir/../EXE
 [ -d $binarydir ] || mkdir $binarydir
 
-cp $currdir/../src/$binary $binarydir
+[ -e $binarydir/$binary ] || cp $currdir/../src/$binary $binarydir
+
+#for size in 12 14 #16 18
+#do
 
 jobdir="LSD-M$size"
+
 [ -d $jobdir ] || mkdir $jobdir
-# mkdir -p $jobdir
-
-for disorder in 15.0 14.0 13.0 12.0 11.0 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0
-do
-
-    #energy=`echo "$disorder + 6.0"| bc`
-    energy=`echo "$disorder/2.0 + 3.0"| bc`
-
-echo "--- hDis=" $disorder ", Min_Eng=" $energy
-
-jobname="LSD-M$size-hD$disorder"
-echo $jobname
-
-jobfile=`printf "$jobname.sh"`
-logfile=`printf "$jobname.log"`
-
-inpfile=LSDdiag-$disorder.inp
-
-echo "binarydir=" $binarydir " jobdir=" $jobdir 
-
-# settings for parallel submission
-
+  # mkdir -p $jobdir
+    
 cd $jobdir
 
-cat > ${jobfile} << EOD
+
+#for disorder in 3.0 2.0 1.0
+#do
+#    energy=4.0
+		
+for disorder in 15.0 14.0 13.0 12.0 11.0 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0 #30.0 29.0 28.0 27.0 26.0 25.0 24.0 23.0 22.0 21.0 20.0 19.0 18.0 17.0 16.0  # 
+do
+
+   #energy=`echo "$disorder + 6.0"| bc`
+   #energy=`echo "$disorder/2.0 + 3.0"| bc`
+    
+    if [ $(echo "$disorder < 4.0" | bc) = 1 ] ; then
+	energy=`echo "4.0"`
+    else
+	energy=`echo "$disorder/2.0 + 3.0"| bc`
+    fi
+    
+    echo "--- hDis=" $disorder ", Min_Eng=" $energy
+
+    jobname="LSD-M$size-hD$disorder"
+    echo $jobname
+    
+    jobfile=`printf "$jobname.sh"`
+    logfile=`printf "$jobname.log"`
+
+    inpfile=LSDdiag-$disorder.inp
+
+    echo "binarydir=" $binarydir " jobdir=" $jobdir 
+
+    # settings for parallel submission
+
+    #cd $jobdir
+	
+    cat > ${jobfile} << EOD
 #!/bin/bash
 #PBS -l nodes=${nodes}:ppn=16
 #PBS -l pmem=${memory}
@@ -107,7 +124,8 @@ $binarydir/$binary <$inpfile >& ${logfile}
 
 done
 
-exit 0
+wait
+#exit 0
 
 EOD
 
@@ -115,14 +133,15 @@ chmod 755 ${jobfile}
 #(msub -q devel $jobdir/${jobfile}) # for queueing system
 #(sbatch -q devel $jobdir/${jobfile}) # for queueing system
 #sbatch ${jobfile} # for queueing system
-(source ${jobfile} )
+(source ${jobfile} ) &
 #(source $jobdir/${jobfile} ) >& $jobdir/${logfile} & # for parallel shell execution
 #source ${jobfile} #>& ${logfile} # for sequential shell execution
 
 #echo "<return>"
 sleep 1
 
-cd ..
-
 done
 
+cd ..
+
+#done
