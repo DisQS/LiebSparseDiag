@@ -200,9 +200,9 @@ PROGRAM LiebJADdia
            ! start of ISeed loop
            ! ----------------------------------------------------------
            
-           DO Seed= ISeed, ISeed+ NSeed -1
+           DO Seed= ISeed, ISeed+ NConfig -1
               
-              PRINT*,"main: ISeed=", ISeed
+              PRINT*,"main: Seed=", Seed
 
               IF(IWriteFlag.GE.1) THEN
                  PRINT*, "  HubDis=", HubDis, " Seed=", Seed
