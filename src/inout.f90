@@ -64,8 +64,8 @@ SUBROUTINE Input(IErr)
   IErr = 0
   ILine= 0
   
-!  OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
-  OPEN(UNIT= IChInp, ERR=120, FILE= "/dev/stdin",STATUS= 'OLD')
+  OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
+  !OPEN(UNIT= IChInp, ERR=120, FILE= "/dev/stdin",STATUS= 'OLD')
   !OPEN(UNIT= IChInp, ERR=120, ACCESS= "stream",STATUS= 'OLD')
 
   ILine= ILine+1
@@ -99,7 +99,11 @@ SUBROUTINE Input(IErr)
   ILine= ILine+1
   READ(IChInp,10,ERR=20) IWriteFlag
   !PRINT*,"IWriteFlag   = ", IWriteFlag
-  
+
+  ILine= ILine+1
+  READ(IChInp,10,ERR=20) IStateFlag
+  !PRINT*,"IStateFlag   = ", IStateFlag
+
   ILine= ILine+1
   READ(IChInp,10,ERR=20) Width0
   !PRINT*,"Width0       = ",Width0
@@ -160,6 +164,7 @@ SUBROUTINE Input(IErr)
      PRINT*,"IRNGFlag     = ", IRNGFlag
      PRINT*,"IKeepFlag    = ", IKeepFlag
      PRINT*,"IWriteFlag   = ", IWriteFlag
+	 PRINT*,"IStateFlag	  = ", IStateFlag
      PRINT*,"Width0       = ", Width0
      PRINT*,"Width1       = ", Width1
      PRINT*,"dWidth       = ", dWidth

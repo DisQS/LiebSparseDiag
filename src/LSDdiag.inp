@@ -1,11 +1,12 @@
 ISeed          = 1234
-NConfig        = 3
-Dim            = 3
+NConfig        = 1
+Dim            = 2
 Nx             = 1
 IBCFlag        = 1
 IRNGFlag       = 0
 IKeepFlag      = 0
 IWriteFlag     = 3
+IStateFlag     = 1
 Width0         = 10
 Width1         = 10
 dWidth         = 1
