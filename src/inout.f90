@@ -424,7 +424,7 @@ SUBROUTINE WriteOutputEVec( Dim, Nx, Inum, NEVals, Lsize, VECS, VECS_size, &
 
   PRINT*,'evector file ',FileName
 
-  OPEN(UNIT= IChEVec, ERR= 40, STATUS= 'UNKNOWN', FILE=FileName)
+  OPEN(UNIT= IChEVec, ERR= 40, STATUS= 'UNKNOWN', FILE=TRIM(ADJUSTL(str))//"/"//FileName)
 
   DO i= 1+( Lsize*( Inum -1) ), Lsize*Inum
      WRITE(UNIT=IChEVec, FMT=45, ERR=50) VECS(i)
