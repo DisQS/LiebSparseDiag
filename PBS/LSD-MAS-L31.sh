@@ -83,8 +83,8 @@ echo "dHubDis       = 1.0           ">>  $inpfile #
 echo "RimDis0       = 0.0            ">>  $inpfile #
 echo "Energy0       = 0.01       ">>  $inpfile #
 #echo "Energy1       = $energy       ">>  $inpfile #
-echo "Energy1       = 2.5           ">>  $inpfile #
-echo "dEnergy       = 0.05      ">>  $inpfile #
+echo "Energy1       = 5.0           ">>  $inpfile #
+echo "dEnergy       = 0.1      ">>  $inpfile #
 echo "NEvals        = 100           ">>  $inpfile #
 echo "Memory        = 100          ">>  $inpfile #
 
