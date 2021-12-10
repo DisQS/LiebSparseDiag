@@ -30,13 +30,14 @@ do
 
 echo "--- hDis=" $disorder ", Eng=" $energy
 
-jobname="L31-$size-E$energy-hD$disorder"
+jobdir="L31-$size-E$energy-hD$disorder"
+mkdir -p $jobdir
+
+jobname=$jobdir-$seed-$config
 echo $jobname
 
 jobfile=`printf "$jobname.sh"`
 logfile=`printf "$jobname.log"`
-jobdir=$jobname
-mkdir -p $jobdir
 
 inpfile=LSDdiag-$size-$energy-$disorder.inp
 
