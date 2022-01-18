@@ -22,7 +22,8 @@ jobdir=$currdir
 #binarydir=$HOME/Projects/LiebSparseDiag/EXE
 binarydir=/storage/disqs/LiebSparseDiag/EXE
 
-for disorder in 18.0 17.75 17.5 17.25 17.0 16.75 16.5 16.25 16.0 15.75 15.5 15.25 15.0
+for disorder in 16.9 16.8 16.7 16.6 16.4 16.3 16.2 16.1
+#18.0 17.75 17.5 17.25 17.0 16.75 16.5 16.25 16.0 15.75 15.5 15.25 15.0
 do
 
 #energy=`echo "$disorder/2.0 + 4.05"| bc`
