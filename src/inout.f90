@@ -64,8 +64,8 @@ SUBROUTINE Input(IErr)
   IErr = 0
   ILine= 0
   
-  !OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
-  OPEN(UNIT= IChInp, ERR=120, FILE= "/dev/stdin",STATUS= 'OLD')
+!  OPEN(UNIT= IChInp, ERR=120, FILE= "LSDdiag.inp",STATUS= 'OLD')
+   OPEN(UNIT= IChInp, ERR=120, FILE= "/dev/stdin",STATUS= 'OLD')
   !OPEN(UNIT= IChInp, ERR=120, ACCESS= "stream",STATUS= 'OLD')
 
   ILine= ILine+1
@@ -258,7 +258,7 @@ SUBROUTINE CheckOutput( Dim, Nx, IWidth, Energy, HubDis, RimDis, ISeed, str, IEr
   
   !   WRITE out the input parameter
   IF(Energy.GE.0.0D0) THEN
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A5,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A5,I6.6,A3,I6.6,A3,I6.6,A1,I5.5,A4)') &
           "Eval-", "L", Dim, Nx, &
           "-M",IWidth, &
           "-TarE", NINT(100.*ABS(Energy)), &
@@ -266,7 +266,7 @@ SUBROUTINE CheckOutput( Dim, Nx, IWidth, Energy, HubDis, RimDis, ISeed, str, IEr
           "-rD", NINT(100.*ABS(RimDis)), "-",& 
           ISeed, ".raw"
   ELSE
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A1,I5.5,A4)') &
           "Eval-","L",Dim, Nx, &
           "-M",IWidth, &
           "-TarE-", NINT(100.*ABS(Energy)), &
@@ -322,7 +322,7 @@ SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis
   
   !   WRITE out the input parameter
   IF(Energy.GE.0.0D0) THEN
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A5,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A5,I6.6,A3,I6.6,A3,I6.6,A1,I5.5,A4)') &
           "Eval-", "L", Dim, Nx, &
           "-M",IWidth, &
           "-TarE", NINT(100.*ABS(Energy)), &
@@ -330,7 +330,7 @@ SUBROUTINE WriteOutputEVal(Dim, Nx, NEVals, EIGS, IWidth, Energy, HubDis, RimDis
           "-rD", NINT(100.*ABS(RimDis)), "-",& 
           ISeed, ".raw"
   ELSE
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A1,I5.5,A4)') &
           "Eval-","L",Dim, Nx, &
           "-M",IWidth, &
           "-TarE-", NINT(100.*ABS(Energy)), &
@@ -402,7 +402,7 @@ SUBROUTINE WriteOutputEVec( Dim, Nx, Inum, NEVals, Lsize, VECS, VECS_size, &
 
   !   WRITE out the input parameter
   IF(Energy.GE.0.0D0) THEN
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A2,A5,I9.9,A7,I7.7,A7,I7.7,A2,I4.4,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A2,A5,I9.9,A7,I7.7,A7,I7.7,A2,I4.4,A1,I5.5,A4)') &
           
           "Evec-","L",Dim, Nx, &
           "-M",IWidth, "-p",&
@@ -412,7 +412,7 @@ SUBROUTINE WriteOutputEVec( Dim, Nx, Inum, NEVals, Lsize, VECS, VECS_size, &
           "-N", Inum, "-", &
           Seed, ".raw"
   ELSE
-     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A2,A5,I9.9,A7,I7.7,A7,I7.7,A2,I4.4,A1,I4.4,A4)') &
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A2,A5,I9.9,A7,I7.7,A7,I7.7,A2,I4.4,A1,I5.5,A4)') &
           "Evec-","L",Dim, Nx, &
           "-M",IWidth, "-m", &
           "-TarE", NINT(1000000.0D0*ABS(Energy)), &
