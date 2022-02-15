@@ -72,27 +72,28 @@ echo create the input file
 inpfile=LSDdiag-$disorder-\$iseed.inp
 touch \$inpfile
 
-echo "ISeed         = \$myseed       ">  \$inpfile #
-echo "NConfig       = 1        ">>  \$inpfile #
-echo "Dim           = 3            ">>  \$inpfile #
-echo "Nx            = 1            ">>  \$inpfile #
-echo "IBCFlag       = 1             ">>  \$inpfile #
-echo "IRNGFlag      = 0             ">>  \$inpfile #
-echo "IKeepFlag     = $keep      ">>  \$inpfile #
-echo "IWriteFlag    = 2       ">>  \$inpfile #
-echo "Width0        = $size       ">>  \$inpfile #
-echo "Width1        = $size       ">>  \$inpfile #
-echo "dWidth        = 2          ">>  \$inpfile #
-echo "HubDis0       = $disorder      ">>  \$inpfile #
-echo "HubDis1       = $disorder           ">>  \$inpfile #
-echo "dHubDis       = 1.0           ">>  \$inpfile #
-#echo "RimDis0       = $disorder      ">>  \$inpfile #
-echo "RimDis0       = 0.0            ">>  \$inpfile #
-echo "Energy0       = $energy    ">>  \$inpfile #
-echo "Energy1       = $energy       ">>  \$inpfile #
-echo "dEnergy       = 0.1      ">>  \$inpfile #
-echo "NEvals        = 100           ">>  \$inpfile #
-echo "Memory        = 100          ">>  \$inpfile #
+echo "ISeed         = \$myseed       ">  $inpfile #
+echo "NConfig       = 1        ">>  $inpfile #
+echo "Dim           = 3            ">>  $inpfile #
+echo "Nx            = 1            ">>  $inpfile #
+echo "IBCFlag       = 1             ">>  $inpfile #
+echo "IRNGFlag      = 0             ">>  $inpfile #
+echo "IKeepFlag     = $keep      ">>  $inpfile #
+echo "IWriteFlag    = 2       ">>  $inpfile #
+echo "IStateFlag    = 0       ">>  $inpfile #
+echo "Width0        = $size       ">>  $inpfile #
+echo "Width1        = $size       ">>  $inpfile #
+echo "dWidth        = 2          ">>  $inpfile #
+echo "HubDis0       = $disorder      ">>  $inpfile #
+echo "HubDis1       = $disorder           ">>  $inpfile #
+echo "dHubDis       = 1.0           ">>  $inpfile #
+#echo "RimDis0       = $disorder      ">>  $inpfile #
+echo "RimDis0       = 0.0            ">>  $inpfile #
+echo "Energy0       = $energy    ">>  $inpfile #
+echo "Energy1       = $energy       ">>  $inpfile #
+echo "dEnergy       = 0.1      ">>  $inpfile #
+echo "NEvals        = 100           ">>  $inpfile #
+echo "Memory        = 100          ">>  $inpfile #
 
 cat \$inpfile
 
