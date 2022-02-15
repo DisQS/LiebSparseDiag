@@ -190,7 +190,7 @@ PROGRAM LiebJADdia
         ! start of Energy loop
         ! ----------------------------------------------------------
         
-        DO Energy= Energy0, Energy1, dEnergy
+        DO Energy= Energy0, Energy1 + dEnergy/2.0, dEnergy
            
            PRINT*,"main: Energy=", Energy
 
