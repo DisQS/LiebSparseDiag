@@ -86,7 +86,7 @@ MODULE IPara
   USE MyNumbers
   INTEGER(KIND=IKIND) :: ISeed, NConfig, Seed, NEvals
   INTEGER(KIND=IKIND) :: Dim, Nx
-  INTEGER(KIND=IKIND) :: Width0, Width1, dWidth, IKeepFlag, IWriteFlag, ISortFlag
+  INTEGER(KIND=IKIND) :: Width0, Width1, dWidth, IKeepFlag, IWriteFlag, ISortFlag, IStateFlag
   INTEGER(KIND=IKIND) :: IFluxFlag, IBCFlag, IRNGFlag, ILevelFlag, IConvFlag
   INTEGER(KIND=IKIND) :: IStripeFlag, IDimenFlag
 END MODULE IPara

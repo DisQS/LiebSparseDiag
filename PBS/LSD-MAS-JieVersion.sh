@@ -105,6 +105,7 @@ echo "IBCFlag       = 1             ">>  $inpfile
 echo "IRNGFlag      = 0             ">>  $inpfile 
 echo "IKeepFlag     = $keep      ">>  $inpfile 
 echo "IWriteFlag    = 2       ">>  $inpfile 
+echo "IStateFlag    = 0       ">>  $inpfile #
 echo "Width0        = $size       ">>  $inpfile 
 echo "Width1        = $size       ">>  $inpfile 
 echo "dWidth        = 2          ">>  $inpfile 

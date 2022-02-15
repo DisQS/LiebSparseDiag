@@ -18,11 +18,10 @@ binary=LSDdiag.IC
 currdir=`pwd`
 jobdir=$currdir
 
-#binarydir=$HOME/Projects/LiebSparseDiag/EXE
-binarydir=/storage/disqs/LiebSparseDiag/EXE
+binarydir=$HOME/Projects/LiebSparseDiagBC/EXE
+#binarydir=/storage/disqs/LiebSparseDiag/EXE
 
-for disorder in 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0 0.2 0.4 0.6 0.7 0.8 1.2 1.4 1.6 1.8 2.5 3.5 4.5 5.5 6.5 7.5 
-# 8.5 9.5 20.0 25.0 30.0 35.0 40.0 15.0 14.0 13.0 12.0 11.0 50.0 60.0 70.0 80.0 90.0 100.0 
+for disorder in 1.0 
 do
 
 energy=`echo "$disorder/2.0 + 4.05"| bc`
@@ -68,21 +67,22 @@ touch $inpfile
 
 echo "ISeed         = \$myseed       ">  $inpfile #
 echo "NConfig       = 1        ">>  $inpfile #
-echo "Dim           = 3            ">>  $inpfile #
-echo "Nx            = 2            ">>  $inpfile #
+echo "Dim           = 2            ">>  $inpfile #
+echo "Nx            = 1            ">>  $inpfile #
 echo "IBCFlag       = 1             ">>  $inpfile #
 echo "IRNGFlag      = 0             ">>  $inpfile #
 echo "IKeepFlag     = $keep      ">>  $inpfile #
 echo "IWriteFlag    = 2       ">>  $inpfile #
+echo "IStateFlag    = 1       ">>  $inpfile #
 echo "Width0        = $size       ">>  $inpfile #
 echo "Width1        = $size       ">>  $inpfile #
 echo "dWidth        = 2          ">>  $inpfile #
 echo "HubDis0       = $disorder      ">>  $inpfile #
 echo "HubDis1       = $disorder           ">>  $inpfile #
 echo "dHubDis       = 1.0           ">>  $inpfile #
-echo "RimDis0       = $disorder      ">>  $inpfile #
-#echo "RimDis0       = 0.0            ">>  $inpfile #
-echo "Energy0       = -$energy       ">>  $inpfile #
+#echo "RimDis0       = $disorder      ">>  $inpfile #
+echo "RimDis0       = 0.0            ">>  $inpfile #
+echo "Energy0       = 0.01       ">>  $inpfile #
 echo "Energy1       = $energy       ">>  $inpfile #
 echo "dEnergy       = 0.25       ">>  $inpfile #
 echo "NEvals        = 100           ">>  $inpfile #

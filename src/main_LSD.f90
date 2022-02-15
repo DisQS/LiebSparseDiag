@@ -347,6 +347,14 @@ PROGRAM LiebJADdia
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
                       IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+                 IF(IStateFlag.NE.0)THEN
+                    PRINT*,"main: PJD() found eigenvectors, these will now be saved into file"
+                    DO Inum= 1,NEIG
+                       Call WriteOutputEVec(Dim, Nx, Inum, NEIG, Lsize, &
+                            VECS, VECS_size, IWidth, Energy, HubDis, & 
+                            RimDis, Seed, str, IErr)
+                    END DO
+                 END IF !IStateFlag IF
               END IF
               
 !!$              SELECT CASE(IKeepFlag)
