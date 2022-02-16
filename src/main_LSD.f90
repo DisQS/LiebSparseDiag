@@ -84,10 +84,15 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
   
   ! ----------------------------------------------------------
-  ! protocol feature
+  ! protocol feature via git
+  ! set: git tag -a v0.0 -m 'Version 0.0'
   ! ----------------------------------------------------------
-  
-  PRINT*,"LiebSparseDiag ", RStr, DStr, AStr 
+#ifdef git
+  PRINT*,"LiebSparseDiag (", &
+       TRIM("GITVERSION"), ")"
+#else
+  PRINT*,"LiebSparseDiag()"
+#endif
   
   ! ----------------------------------------------------------
   ! inout handling
