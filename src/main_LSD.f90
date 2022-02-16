@@ -84,10 +84,15 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
   
   ! ----------------------------------------------------------
-  ! protocol feature
+  ! protocol feature via git
+  ! set: git tag -a v0.0 -m 'Version 0.0'
   ! ----------------------------------------------------------
-  
-  PRINT*,"LiebSparseDiag ", RStr, DStr, AStr 
+#ifdef git
+  PRINT*,"LiebSparseDiag (", &
+       TRIM("GITVERSION"), ")"
+#else
+  PRINT*,"LiebSparseDiag()"
+#endif
   
   ! ----------------------------------------------------------
   ! inout handling
@@ -190,7 +195,7 @@ PROGRAM LiebJADdia
         ! start of Energy loop
         ! ----------------------------------------------------------
         
-        DO Energy= Energy0, Energy1, dEnergy
+        DO Energy= Energy0, Energy1 + dEnergy/2.0, dEnergy
            
            PRINT*,"main: Energy=", Energy
 
