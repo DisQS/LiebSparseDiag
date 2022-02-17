@@ -212,11 +212,23 @@ PROGRAM LiebJADdia
 
               CALL SRANDOM(Seed)
 
-              ISSeed= NINT(LARGE * &
-                   DRANDOM(Seed + & 
-                   NINT(Energy*1000.+1) + &
-                   NINT(HubDis*1000000.+1) + &
-                   NINT(RimDis*100000000.+1) ))
+              ISSeed= &
+                   Seed + &
+                   IWidth*1000 + & 
+                   NINT(Energy*100000.) + &
+                   NINT(HubDis*10000000.) + &
+                   NINT(RimDis*100000000.) 
+
+              CALL SRANDOM(ISSeed)
+
+              ISSeed= NINT(LARGE * DRANDOM(ISSeed)) 
+
+!!$              PRINT*, "SIS=",  Seed, &
+!!$                   Seed*IWidth, & 
+!!$                   NINT(Energy*1000.+1), &
+!!$                   NINT(HubDis*1000000.+1), &
+!!$                   NINT(RimDis*100000000.+1), &
+!!$                   ISSeed
 
               SELECT CASE(IWriteFlag)
               CASE(1,2)
@@ -237,7 +249,8 @@ PROGRAM LiebJADdia
 
               SELECT CASE(IKeepFlag)
               CASE(1)
-                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed,ISSeed, str, IErr )
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, &
+                      Seed,ISSeed, str, IErr )
                  IF(IErr.EQ.2) CYCLE
               END SELECT
               
@@ -353,7 +366,8 @@ PROGRAM LiebJADdia
                  NEIG= INFO - 1
               END IF
 
-              CALL PJDCLEANUP   !to be used if you want a new preconditioner in every iteration
+              !to be used if you want a new preconditioner in every iteration
+              CALL PJDCLEANUP   
 
               ! ----------------------------------------------------------
               ! write results into files
@@ -364,9 +378,6 @@ PROGRAM LiebJADdia
               ELSE IF(NEIG.LT.0)THEN
                  PRINT*,"main: PJD() reported ERROR: #", NEIG
               ELSE
-!!$                 DO i=1, NEIG
-!!$                    PRINT*, i, EIGS(i)
-!!$                 END DO
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
                       IWidth, Energy, HubDis, RimDis, Seed,ISSeed, str, IErr)
