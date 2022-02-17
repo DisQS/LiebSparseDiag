@@ -8,15 +8,16 @@
 #
 # $Log: makefile.IC,v $
 # Revision 1.2  2007/09/25 10:30:33  phsht
-# rewrote to make "look" nicer and removed an ERROR for NEvals and Energy; now makefile has proper flags to check for these things automatically
+# rewrote to make "look" nicer and removed an ERROR for NEvals and Energy; 
+# now makefile has proper flags to check for these things automatically
 #
 # Revision 1.1  2007/09/20 16:53:39  phrfar
 # previous files from a project of Rudo's. To be used as templates.
 #
 #-----------------------------------------------------------------#
 
-F77 = ifort
-F90 = ifort
+F77 = ifort -xHOST
+F90 = ifort -xHOST
 
 #F77FLAGS = -C -g +u -r8 -132 -u              # For debugging
 F77FLAGS = -O2 -r8 -u -132   # For optimizing
