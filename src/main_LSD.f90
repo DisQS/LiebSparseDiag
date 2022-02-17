@@ -31,7 +31,7 @@ PROGRAM LiebJADdia
   ! Parameters for Lieb matrix
   INTEGER(KIND=IKIND) IWidth, ISSeed
   
-  INTEGER(KIND=IKIND) i, j, k, LSize, CSize
+  INTEGER(KIND=IKIND) i, j, k, LSize, CSize, LARGE
        
   ! arguments to pass to the JD routine
   INTEGER(KIND=IKIND) &
@@ -39,7 +39,7 @@ PROGRAM LiebJADdia
        ITER, IPRINT, INFO, IJOB, NDX1, NDX2, IErr, sumIErr, maxsp, &
        VECS_size       ! optimal workspace (N.B.: here, maxsp*maxsp>maxeig)
 
-  PARAMETER (maxsp=20)
+  PARAMETER (maxsp=20, LARGE=2147483647)
 
   REAL(KIND=RKIND) &
        SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL
@@ -212,16 +212,21 @@ PROGRAM LiebJADdia
 
               CALL SRANDOM(Seed)
 
-              ISSeed= ABS(Seed*IWidth* &
-                   NINT((DRANDOM(ISSeed) - 0.5D0)*Energy*1000.)*&
-                   NINT((DRANDOM(ISSeed) - 0.5D0)*HubDis*1000.) )
+              ISSeed= NINT(LARGE * &
+                   DRANDOM(Seed + & 
+                   NINT(Energy*1000.+1) + &
+                   NINT(HubDis*1000000.+1) + &
+                   NINT(RimDis*100000000.+1) ))
 
               SELECT CASE(IWriteFlag)
               CASE(1,2)
                  PRINT*, " Seed=", Seed, " -> ISSeed=", ISSeed
               CASE(3,4)
-                 PRINT*, "IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
-                      "S=", Seed, "IS=", ISSeed
+!!$                 PRINT*, "IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
+!!$                      "S=", Seed, "IS=", ISSeed
+                 WRITE(*, '(A3,I3,A4,F6.3,A4,F5.3,A3,F5.3,A3,I5,A4,I10)') &
+                      "IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
+                      " S=", Seed, " IS=", ISSeed
               CASE DEFAULT
                  PRINT*,"main: Seed=", Seed
               END SELECT              
@@ -232,7 +237,7 @@ PROGRAM LiebJADdia
 
               SELECT CASE(IKeepFlag)
               CASE(1)
-                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed, str, IErr )
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed,ISSeed, str, IErr )
                  IF(IErr.EQ.2) CYCLE
               END SELECT
               
@@ -364,30 +369,17 @@ PROGRAM LiebJADdia
 !!$                 END DO
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+                      IWidth, Energy, HubDis, RimDis, Seed,ISSeed, str, IErr)
                  IF(IStateFlag.NE.0)THEN
                     PRINT*,"main: PJD() found eigenvectors, these will now be saved into file"
                     DO Inum= 1,NEIG
                        Call WriteOutputEVec(Dim, Nx, Inum, NEIG, Lsize, &
                             VECS, VECS_size, IWidth, Energy, HubDis, & 
-                            RimDis, Seed, str, IErr)
+                            RimDis, Seed,ISSeed, str, IErr)
                     END DO
                  END IF !IStateFlag IF
               END IF
               
-!!$              SELECT CASE(IKeepFlag)
-!!$              CASE(0)
-!!$                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-!!$                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-!!$              CASE(1)          
-!!$                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed, str, IErr )
-!!$                 IF(IErr.EQ.2) GOTO 100
-!!$
-!!$                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-!!$                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-!!$                 
-!!$100           END SELECT
-                         
            END DO !Seed loop
            
         END DO !Energy loop
