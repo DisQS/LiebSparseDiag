@@ -236,7 +236,7 @@ PROGRAM LiebJADdia
               CASE(3,4)
 !!$                 PRINT*, "IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
 !!$                      "S=", Seed, "IS=", ISSeed
-                 WRITE(*, '(A3,I3,A4,F6.3,A4,F5.3,A3,F5.3,A3,I5,A4,I10)') &
+                 WRITE(*, '(A3,I3,A4,F6.3,A4,F5.3,A3,F6.3,A3,I5,A4,I10)') &
                       "IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
                       " S=", Seed, " IS=", ISSeed
               CASE DEFAULT
