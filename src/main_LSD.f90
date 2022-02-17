@@ -29,7 +29,7 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
 
   ! Parameters for Lieb matrix
-  INTEGER(KIND=IKIND) IWidth
+  INTEGER(KIND=IKIND) IWidth, ISSeed
   
   INTEGER(KIND=IKIND) i, j, k, LSize, CSize
        
@@ -88,8 +88,7 @@ PROGRAM LiebJADdia
   ! set: git tag -a v0.0 -m 'Version 0.0'
   ! ----------------------------------------------------------
 #ifdef git
-  PRINT*,"LiebSparseDiag (", &
-       TRIM("GITVERSION"), ")"
+  PRINT*,"LiebSparseDiag (", TRIM("GITVERSION"), ")"
 #else
   PRINT*,"LiebSparseDiag()"
 #endif
@@ -207,11 +206,25 @@ PROGRAM LiebJADdia
            
            DO Seed= ISeed, ISeed+ NConfig -1
               
-              PRINT*,"main: Seed=", Seed
+              ! ----------------------------------------------------------
+              ! Compute actual seed
+              ! ----------------------------------------------------------
 
-              IF(IWriteFlag.GE.1) THEN
-                 PRINT*, "  HubDis=", HubDis, " Seed=", Seed
-              ENDIF
+              CALL SRANDOM(Seed)
+
+              ISSeed= ABS(Seed*IWidth* &
+                   NINT((DRANDOM(ISSeed) - 0.5D0)*Energy*1000.)*&
+                   NINT((DRANDOM(ISSeed) - 0.5D0)*HubDis*1000.) )
+
+              SELECT CASE(IWriteFlag)
+              CASE(1,2)
+                 PRINT*, " Seed=", Seed, " -> ISSeed=", ISSeed
+              CASE(3,4)
+                 PRINT*, "IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
+                      "S=", Seed, "IS=", ISSeed
+              CASE DEFAULT
+                 PRINT*,"main: Seed=", Seed
+              END SELECT              
 
               ! ----------------------------------------------------------
               ! CHECK if same exists and can be overwritten
@@ -223,7 +236,7 @@ PROGRAM LiebJADdia
                  IF(IErr.EQ.2) CYCLE
               END SELECT
               
-              CALL SRANDOM(Seed)
+              CALL SRANDOM(ISSeed)
               
               ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
               a_w(:) = a(:) 
@@ -232,12 +245,12 @@ PROGRAM LiebJADdia
               DO i=1, IWidth**Dim
                  
                  k= (i-1)*(Nx*Dim+1) + 1
-                 a_w(ia(k)) = HubDis*(DRANDOM(Seed) - 0.5D0)
+                 a_w(ia(k)) = HubDis*(DRANDOM(ISSeed) - 0.5D0)
                  
                  DO j=2, (Nx*Dim +1)
                     
                     k = (i-1)*(Nx*Dim+1) + j
-                    a_w(ia(k)) = RimDis*(DRANDOM(Seed) - 0.5D0)
+                    a_w(ia(k)) = RimDis*(DRANDOM(ISSeed) - 0.5D0)
                     
                  END DO
                  
