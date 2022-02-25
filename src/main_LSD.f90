@@ -15,7 +15,7 @@ PROGRAM LiebJADdia
   USE IPara
   USE DPara
   USE IChannels
-  USE RNG
+  USE RNG_MT
   USE SETBINS
   !USE RConstants					   
   !USE EigenPara
@@ -212,14 +212,15 @@ PROGRAM LiebJADdia
 
               CALL SRANDOM(Seed)
 
-              ISSeed= &
-                   Seed + &
-                   IWidth*1000 + & 
-                   NINT(Energy*100000.) + &
-                   NINT(HubDis*10000000.) + &
-                   NINT(RimDis*100000000.) 
-
-              CALL SRANDOM(ISSeed)
+              ISSeed= Seed
+!!$              &
+!!$                   Seed + &
+!!$                   IWidth*1000 + & 
+!!$                   NINT(Energy*100000.) + &
+!!$                   NINT(HubDis*10000000.) + &
+!!$                   NINT(RimDis*100000000.) 
+!!$
+!!$              CALL SRANDOM(ISSeed)
 
               ISSeed= NINT(LARGE * DRANDOM(ISSeed)) 
 
