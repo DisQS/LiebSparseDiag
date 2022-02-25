@@ -16,6 +16,7 @@ PROGRAM LiebJADdia
   USE DPara
   USE IChannels
   USE RNG_MT
+  USE mt95
   USE SETBINS
   !USE RConstants					   
   !USE EigenPara
@@ -29,7 +30,7 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
 
   ! Parameters for Lieb matrix
-  INTEGER(KIND=IKIND) IWidth, ISSeed
+  INTEGER(KIND=IKIND) IWidth, ISSeed(5)
   
   INTEGER(KIND=IKIND) i, j, k, LSize, CSize, LARGE
        
@@ -42,7 +43,7 @@ PROGRAM LiebJADdia
   PARAMETER (maxsp=20, LARGE=2147483647)
 
   REAL(KIND=RKIND) &
-       SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL
+       SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL, drandval
 
   ! output arguments from the Lieb routine
   INTEGER(KIND=IKIND) nz
@@ -210,36 +211,29 @@ PROGRAM LiebJADdia
               ! Compute actual seed
               ! ----------------------------------------------------------
 
-              CALL SRANDOM(Seed)
+              ISSeed(1)= Seed
+              ISSeed(2)= IWidth
+              ISSeed(3)= NINT(Energy*1000.)
+              ISSeed(4)= NINT(HubDis*1000.)
+              ISSeed(5)= NINT(RimDis*1000.)
 
-              ISSeed= Seed
-!!$              &
-!!$                   Seed + &
-!!$                   IWidth*1000 + & 
-!!$                   NINT(Energy*100000.) + &
-!!$                   NINT(HubDis*10000000.) + &
-!!$                   NINT(RimDis*100000000.) 
-!!$
-!!$              CALL SRANDOM(ISSeed)
-
-              ISSeed= NINT(LARGE * DRANDOM(ISSeed)) 
-
-!!$              PRINT*, "SIS=",  Seed, &
-!!$                   Seed*IWidth, & 
-!!$                   NINT(Energy*1000.+1), &
-!!$                   NINT(HubDis*1000000.+1), &
-!!$                   NINT(RimDis*100000000.+1), &
-!!$                   ISSeed
+!              CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
 
               SELECT CASE(IWriteFlag)
               CASE(1,2)
-                 PRINT*, " Seed=", Seed, " -> ISSeed=", ISSeed
+                 PRINT*, "-- Seed=", Seed
+                 PRINT*, "-> ISSeed=", ISSeed
               CASE(3,4)
-!!$                 PRINT*, "IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
+!!$                 PRINT*, "IS: IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
 !!$                      "S=", Seed, "IS=", ISSeed
-                 WRITE(*, '(A3,I3,A4,F6.3,A4,F5.3,A3,F6.3,A3,I5,A4,I10)') &
-                      "IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
-                      " S=", Seed, " IS=", ISSeed
+                 CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
+                 CALL genrand_real1(drandval)
+                 CALL SRANDOM5(ISSeed)
+                 drandval=DRANDOM5(ISSeed)
+                 WRITE(*, '(A7,I3,A4,F6.3,A4,F5.3,A3,F6.3,A3,I5,A4,F16.10)') &
+                      "IS: IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
+                      " S=", Seed, " R=", drandval
+                 PRINT*, "ISSeed=", ISSeed
               CASE DEFAULT
                  PRINT*,"main: Seed=", Seed
               END SELECT              
@@ -251,11 +245,11 @@ PROGRAM LiebJADdia
               SELECT CASE(IKeepFlag)
               CASE(1)
                  CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, &
-                      Seed,ISSeed, str, IErr )
+                      Seed, str, IErr )
                  IF(IErr.EQ.2) CYCLE
               END SELECT
               
-              CALL SRANDOM(ISSeed)
+              CALL genrand_int31(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed)
               
               ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
               a_w(:) = a(:) 
@@ -264,12 +258,16 @@ PROGRAM LiebJADdia
               DO i=1, IWidth**Dim
                  
                  k= (i-1)*(Nx*Dim+1) + 1
-                 a_w(ia(k)) = HubDis*(DRANDOM(ISSeed) - 0.5D0)
+                 !CALL genrand_real1(drandval)
+                 drandval= DRANDOM5(ISSeed)
+                 a_w(ia(k)) = HubDis*(drandval - 0.5D0)
                  
                  DO j=2, (Nx*Dim +1)
                     
                     k = (i-1)*(Nx*Dim+1) + j
-                    a_w(ia(k)) = RimDis*(DRANDOM(ISSeed) - 0.5D0)
+                    !CALL genrand_real1(drandval)
+                    drandval= DRANDOM5(ISSeed)
+                    a_w(ia(k)) = RimDis*(drandval - 0.5D0)
                     
                  END DO
                  
@@ -381,13 +379,13 @@ PROGRAM LiebJADdia
               ELSE
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-                      IWidth, Energy, HubDis, RimDis, Seed,ISSeed, str, IErr)
+                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
                  IF(IStateFlag.NE.0)THEN
                     PRINT*,"main: PJD() found eigenvectors, these will now be saved into file"
                     DO Inum= 1,NEIG
                        Call WriteOutputEVec(Dim, Nx, Inum, NEIG, Lsize, &
                             VECS, VECS_size, IWidth, Energy, HubDis, & 
-                            RimDis, Seed,ISSeed, str, IErr)
+                            RimDis, Seed, str, IErr)
                     END DO
                  END IF !IStateFlag IF
               END IF
