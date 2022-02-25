@@ -249,7 +249,8 @@ PROGRAM LiebJADdia
                  IF(IErr.EQ.2) CYCLE
               END SELECT
               
-              CALL genrand_int31(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed)
+              !CALL genrand_int31(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed
+              CALL SRANDOM5(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed)
               
               ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
               a_w(:) = a(:) 
