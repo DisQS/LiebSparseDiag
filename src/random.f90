@@ -1647,9 +1647,9 @@ module RNG_MT
 
   ! accessibility
   private
-  public :: SRANDOM
+  public :: SRANDOM, SRANDOM5
   public :: IRANDOM 
-  public :: DRANDOM 
+  public :: DRANDOM, DRANDOM5 
   public :: GRANDOM
   
   ! parameter
@@ -1675,6 +1675,22 @@ contains
     call genrand_init(idum)
   
   end subroutine SRANDOM
+
+  ! ------------------------------------------------------------------
+  ! SRANDOM5() 
+  !
+  ! Random number generator SEED interface for use with any old RND
+  ! ------------------------------------------------------------------
+  subroutine SRANDOM5( ISeed )
+    integer, intent(in) :: ISeed(5)
+
+    integer idum(5)
+
+    ! change following lines to incorporate different RND generators
+    idum = ISeed
+    call genrand_init(idum)
+  
+  end subroutine SRANDOM5
 
   ! ------------------------------------------------------------------
   ! IRANDOM() 
@@ -1703,6 +1719,20 @@ contains
     call genrand_real1(dRet)  ! NOTE that ISeed is never used
 
   end function DRANDOM
+
+  ! ------------------------------------------------------------------
+  ! DRANDOM5() 
+  !
+  ! Random number generator interface for use with any old RND
+  ! ------------------------------------------------------------------
+  function DRANDOM5( ISeed ) result(dRet)
+    integer, intent(in) :: ISeed(5)
+    real(kind=rkind):: dRet
+
+    ! change following lines to incorporate different RND generators
+    call genrand_real1(dRet)  ! NOTE that ISeed is never used
+
+  end function DRANDOM5
 
   ! ------------------------------------------------------------------
   ! GRANDOM() 
