@@ -1647,6 +1647,7 @@ module RNG_MT
 
   ! accessibility
   private
+
   public :: SRANDOM, SRANDOM5
   public :: IRANDOM 
   public :: DRANDOM, DRANDOM5 
