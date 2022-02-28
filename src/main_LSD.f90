@@ -15,7 +15,8 @@ PROGRAM LiebJADdia
   USE IPara
   USE DPara
   USE IChannels
-  USE RNG
+  USE RNG_MT
+  USE mt95
   USE SETBINS
   !USE RConstants					   
   !USE EigenPara
@@ -29,9 +30,9 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
 
   ! Parameters for Lieb matrix
-  INTEGER(KIND=IKIND) IWidth
+  INTEGER(KIND=IKIND) IWidth, ISSeed(5)
   
-  INTEGER(KIND=IKIND) i, j, k, LSize, CSize
+  INTEGER(KIND=IKIND) i, j, k, LSize, CSize, LARGE
        
   ! arguments to pass to the JD routine
   INTEGER(KIND=IKIND) &
@@ -39,10 +40,10 @@ PROGRAM LiebJADdia
        ITER, IPRINT, INFO, IJOB, NDX1, NDX2, IErr, sumIErr, maxsp, &
        VECS_size       ! optimal workspace (N.B.: here, maxsp*maxsp>maxeig)
 
-  PARAMETER (maxsp=20)
+  PARAMETER (maxsp=20, LARGE=2147483647)
 
   REAL(KIND=RKIND) &
-       SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL
+       SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL, drandval
 
   ! output arguments from the Lieb routine
   INTEGER(KIND=IKIND) nz
@@ -88,8 +89,7 @@ PROGRAM LiebJADdia
   ! set: git tag -a v0.0 -m 'Version 0.0'
   ! ----------------------------------------------------------
 #ifdef git
-  PRINT*,"LiebSparseDiag (", &
-       TRIM("GITVERSION"), ")"
+  PRINT*,"LiebSparseDiag (", TRIM("GITVERSION"), ")"
 #else
   PRINT*,"LiebSparseDiag()"
 #endif
@@ -207,11 +207,36 @@ PROGRAM LiebJADdia
            
            DO Seed= ISeed, ISeed+ NConfig -1
               
-              PRINT*,"main: Seed=", Seed
+              ! ----------------------------------------------------------
+              ! Compute actual seed
+              ! ----------------------------------------------------------
 
-              IF(IWriteFlag.GE.1) THEN
-                 PRINT*, "  HubDis=", HubDis, " Seed=", Seed
-              ENDIF
+              ISSeed(1)= Seed
+              ISSeed(2)= IWidth
+              ISSeed(3)= NINT(Energy*1000.)
+              ISSeed(4)= NINT(HubDis*1000.)
+              ISSeed(5)= NINT(RimDis*1000.)
+
+!              CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
+
+              SELECT CASE(IWriteFlag)
+              CASE(1,2)
+                 PRINT*, "-- Seed=", Seed
+                 PRINT*, "-> ISSeed=", ISSeed
+              CASE(3,4)
+!!$                 PRINT*, "IS: IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
+!!$                      "S=", Seed, "IS=", ISSeed
+                 CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
+                 CALL genrand_real1(drandval)
+                 CALL SRANDOM5(ISSeed)
+                 drandval=DRANDOM5(ISSeed)
+                 WRITE(*, '(A7,I3,A4,F6.3,A4,F5.3,A3,F6.3,A3,I5,A4,F16.10)') &
+                      "IS: IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
+                      " S=", Seed, " R=", drandval
+                 PRINT*, "ISSeed=", ISSeed
+              CASE DEFAULT
+                 PRINT*,"main: Seed=", Seed
+              END SELECT              
 
               ! ----------------------------------------------------------
               ! CHECK if same exists and can be overwritten
@@ -219,11 +244,13 @@ PROGRAM LiebJADdia
 
               SELECT CASE(IKeepFlag)
               CASE(1)
-                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed, str, IErr )
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, &
+                      Seed, str, IErr )
                  IF(IErr.EQ.2) CYCLE
               END SELECT
               
-              CALL SRANDOM(Seed)
+              !CALL genrand_int31(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed
+              CALL SRANDOM5(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed)
               
               ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
               a_w(:) = a(:) 
@@ -232,12 +259,16 @@ PROGRAM LiebJADdia
               DO i=1, IWidth**Dim
                  
                  k= (i-1)*(Nx*Dim+1) + 1
-                 a_w(ia(k)) = HubDis*(DRANDOM(Seed) - 0.5D0)
+                 !CALL genrand_real1(drandval)
+                 drandval= DRANDOM5(ISSeed)
+                 a_w(ia(k)) = HubDis*(drandval - 0.5D0)
                  
                  DO j=2, (Nx*Dim +1)
                     
                     k = (i-1)*(Nx*Dim+1) + j
-                    a_w(ia(k)) = RimDis*(DRANDOM(Seed) - 0.5D0)
+                    !CALL genrand_real1(drandval)
+                    drandval= DRANDOM5(ISSeed)
+                    a_w(ia(k)) = RimDis*(drandval - 0.5D0)
                     
                  END DO
                  
@@ -335,7 +366,8 @@ PROGRAM LiebJADdia
                  NEIG= INFO - 1
               END IF
 
-              CALL PJDCLEANUP   !to be used if you want a new preconditioner in every iteration
+              !to be used if you want a new preconditioner in every iteration
+              CALL PJDCLEANUP   
 
               ! ----------------------------------------------------------
               ! write results into files
@@ -346,9 +378,6 @@ PROGRAM LiebJADdia
               ELSE IF(NEIG.LT.0)THEN
                  PRINT*,"main: PJD() reported ERROR: #", NEIG
               ELSE
-!!$                 DO i=1, NEIG
-!!$                    PRINT*, i, EIGS(i)
-!!$                 END DO
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
                       IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
@@ -362,19 +391,6 @@ PROGRAM LiebJADdia
                  END IF !IStateFlag IF
               END IF
               
-!!$              SELECT CASE(IKeepFlag)
-!!$              CASE(0)
-!!$                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-!!$                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-!!$              CASE(1)          
-!!$                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, Seed, str, IErr )
-!!$                 IF(IErr.EQ.2) GOTO 100
-!!$
-!!$                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-!!$                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
-!!$                 
-!!$100           END SELECT
-                         
            END DO !Seed loop
            
         END DO !Energy loop
