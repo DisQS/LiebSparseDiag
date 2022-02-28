@@ -187,7 +187,7 @@ PROGRAM LiebJADdia
      ! start of HubDis loop, not finished yet, just keep HubDis0= HubDis1
      ! -----------------------------------------------------------------
        
-     DO HubDis= HubDis0, HubDis1, dHubDis
+     DO HubDis= HubDis0, HubDis1 + dHubDis/2.0, dHubDis
     
         PRINT*,"main: HubDis=", HubDis
 
