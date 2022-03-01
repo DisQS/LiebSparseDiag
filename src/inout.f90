@@ -265,6 +265,14 @@ SUBROUTINE CheckOutput( Dim, Nx, IWidth, Energy, HubDis, RimDis, PreSeed, str, I
           "-hD", NINT(100.*ABS(HubDis)), &
           "-rD", NINT(100.*ABS(RimDis)), "-c",& 
           PreSeed, ".raw" !"_s", ISSeed, 
+  ELSE
+     WRITE(FileName, '(A5,A1,I1,I1,A2,I4.4,A6,I6.6,A3,I6.6,A3,I6.6,A2,I5.5,A4)') &
+          "Eval-","L",Dim, Nx, &
+          "-M",IWidth, &
+          "-TarE-", NINT(100.*ABS(Energy)), &
+          "-hD",NINT(100.*ABS(HubDis)), &
+          "-rD", NINT(100.*ABS(RimDis)), "-c",&
+          PreSeed, ".raw" !"_s", ISSeed, 
   ENDIF
   
   OPEN(UNIT= IChOut, ERR= 10, STATUS= 'NEW', FILE= TRIM(ADJUSTL(str))//"/"//FileName)
