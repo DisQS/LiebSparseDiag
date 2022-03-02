@@ -22,7 +22,7 @@ jobdir=$currdir
 binarydir=$HOME/Projects/LiebSparseDiag/EXE
 #binarydir=/storage/disqs/LiebSparseDiag/EXE
 
-for disorder in 7.5 8.0
+for disorder in 16.0 16.05 16.1 16.15 16.2 16.25 16.3 16.35 16.4 16.45 16.5 16.55 16.6 16.7 16.8 16.9
     #16.0 16.1 16.15 16.2 16.25 16.3 16.35 16.4 16.45 16.6 16.7 16.8 16.9
     #8.0 7.5 7.0 6.5 6.0 5.5 5.0 4.5 4.0 3.5 3.0 2.5 2.0 1.5 1.0 0.5
     #18.0 17.75 17.5 17.25 17.0 16.75 16.5 16.25 16.0 15.75 15.5 15.25 15.0
@@ -106,6 +106,9 @@ MY_SRUN_OPTS="-N 1 -n 1 --exclusive"
 MY_EXEC="$binarydir/$binary <LSDdiag-$disorder-{}.inp"
 
 parallel \$MY_PARALLEL_OPTS srun \$MY_SRUN_OPTS \$MY_EXEC ::: {1..$config}
+
+zip -m inp.zip *.inp
+zip -m sh.zip *.sh
 
 exit 0
 
