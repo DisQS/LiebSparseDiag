@@ -491,7 +491,11 @@ SUBROUTINE GetDirec(Dim, Nx, Width, HubDis, RimDis, Energy, str)
 !!$  PRINT*,str
   PRINT*, "GetDirec(): checking for ", str, Dim, Nx, Width, HubDis, RimDis, Energy
 
-  INQUIRE(file=TRIM(ADJUSTL(str)), Exist=ierr1)
+#ifdef ifort
+  INQUIRE(directory=TRIM(ADJUSTL(str)), Exist=ierr1) ! ifort
+#else
+  INQUIRE(file=TRIM(ADJUSTL(str)), Exist=ierr1) ! gfortran
+#endif
   IF(ierr1)THEN
      PRINT*,"GetDirec(): directory exists and doesn't need to be created!"
      WRITE(*,'(/)')

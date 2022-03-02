@@ -58,7 +58,7 @@ util.o:     util.f90
 	$(F90) $(F90FLAGS) -c util.f90
 
 inout.o:     inout.f90
-	$(F90) $(F90FLAGS) -c inout.f90
+	$(F90) $(F90FLAGS) -c inout.f90	-fpp -Difort=true
 
 etime.o:     etime.f90
 	$(F90) $(F90FLAGS) -c etime.f90
