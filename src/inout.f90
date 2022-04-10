@@ -287,7 +287,7 @@ SUBROUTINE CheckOutput( Dim, Nx, IWidth, Energy, HubDis, RimDis, PreSeed, str, I
   RETURN
   
 10 WRITE(*,'(A16,A54,A22)') "CheckOutput(): ", &
-        TRIM(FileName), " exists -- proceeding!"
+        TRIM(FileName), " exists -- skipping!"
 
   !PRINT*, "CheckOutput(): ", TRIM(FileName), " exists -- skipping!"
   IErr= 2
