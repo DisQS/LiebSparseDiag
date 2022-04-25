@@ -19,15 +19,15 @@ binary=LSDdiag.IC
 currdir=`pwd`
 jobdir=$currdir
 
-jobdir="RVL-L31-E$energy-M$size"
+jobdir="RVL-L31-E$energy"
 mkdir -p $jobdir
 
 jobname=$jobdir-$configs-$dirs
 echo $jobname
 
-jobfile=`printf "$jobname.sh"`
-wlsfile=`printf "$jobname.wls"`
-logfile=`printf "$jobname.log"`
+jobfile=`printf "$jobname-M$size.sh"`
+wlsfile=`printf "$jobname-M$size.wls"`
+logfile=`printf "$jobname-M$size.log"`
 
 # settings for parallel submission
 
@@ -213,6 +213,9 @@ Export["$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $
 ,
 {iMM,Length[MMlist]}
 ];
+
+Print[phasedata];
+Print["--- FINISHED!];
 
 EOD
 
