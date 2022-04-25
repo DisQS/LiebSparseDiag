@@ -150,7 +150,7 @@ AppendTo[allstatrlist,{Mean[rlist],StandardDeviation[rlist]/Sqrt[Length[rlist]]}
 
 If[
 Mod[ndone*100/lensamples,10]==0,
-Print[{ifile,N[ndone/lensamples],N[ndone/lensamples],(AbsoluteTime[]-starttime),(AbsoluteTime[]-starttime)/N[ndone/lensamples]}]]
+Print[{MM,N[idir/lendirs],ifile,N[ndone/lensamples],(AbsoluteTime[]-starttime),(AbsoluteTime[]-starttime)/N[ndone/lensamples]}]]
 ,{ifile,1,lensamples}
 ];
 
@@ -191,7 +191,7 @@ Export[rvlname,Flatten[allrlist],"Table"]
 
 If[
 Mod[idir*100/lendirs,10]==0,
-Print[{MM,N[idir/lendirs],N[idir/lendirs],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs]}]]
+Print[{MM,N[idir/lendirs],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs]}]]
 ,{idir,1,lendirs}
 ];
 
@@ -241,8 +241,8 @@ chmod 755 ${jobdir}/${jobfile}
 chmod 755 ${jobdir}/${wlsfile}
 ##(msub -q devel $jobdir/${jobfile}) # for queueing system
 ##(sbatch -q devel $jobdir/${jobfile}) # for queueing system
-sbatch ${jobdir}/${jobfile} # for queueing system
-##(source $jobdir/${jobfile} ) >& $jobdir/${logfile} & # for parallel shell execution
+#sbatch ${jobdir}/${jobfile} # for queueing system
+(source ${jobdir}/${jobfile} ) >& ${jobdir}/${logfile} & # for parallel shell execution
 #source ${jobdir}/${jobfile} # for sequential shell execution
 
 #echo "<return>"
