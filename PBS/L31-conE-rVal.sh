@@ -215,7 +215,7 @@ Export["$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $
 ];
 
 Print[phasedata];
-Print["--- FINISHED!];
+Print["--- FINISHED!"];
 
 EOD
 
