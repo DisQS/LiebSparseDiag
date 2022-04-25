@@ -150,7 +150,7 @@ AppendTo[allstatrlist,{Mean[rlist],StandardDeviation[rlist]/Sqrt[Length[rlist]]}
 
 If[
 Mod[ndone*100/lensamples,10]==0,
-Print[{MM,N[idir/lendirs],ifile,N[ndone/lensamples],(AbsoluteTime[]-starttime),(AbsoluteTime[]-starttime)/N[ndone/lensamples]}]]
+Print[{MM,N[idir/lendirs],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs],{ifile,N[ndone/lensamples],(AbsoluteTime[]-starttime),(AbsoluteTime[]-starttime)/N[ndone/lensamples]}}]]
 ,{ifile,1,lensamples}
 ];
 
