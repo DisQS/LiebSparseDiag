@@ -77,6 +77,7 @@ allavglist={};
 
 starttimeD=AbsoluteTime[];
 lendirs=Min[maxdirs,Length[alldirs]];
+
 Do[
 dirname=alldirs[[idir]];
 Print["--- "<>dirname];
@@ -149,8 +150,8 @@ AppendTo[allrlist,rlist];
 AppendTo[allstatrlist,{Mean[rlist],StandardDeviation[rlist]/Sqrt[Length[rlist]]}];
 
 If[
-Mod[ndone*100/lensamples,10]==0,
-Print[{MM,N[idir/lendirs],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs],{ifile,N[ndone/lensamples],(AbsoluteTime[]-starttime),(AbsoluteTime[]-starttime)/N[ndone/lensamples]}}]]
+Mod[ifile,Floor[lensamples/10]]==0,
+Print[{MM,N[idir/lendirs,2],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs],{ifile,N[ndone/lensamples,2],(AbsoluteTime[]-starttime),(AbsoluteTime[]-starttime)/N[ndone/lensamples]}}]]
 ,{ifile,1,lensamples}
 ];
 
@@ -189,9 +190,15 @@ PrintTemporary["     writing "<>rvlname];
 Export[rvlname,Flatten[allrlist],"Table"]
 ];
 
+tmpphasedata=Sort[Transpose[{Transpose[allavglist][[7]],Chop[Transpose[allavglist][[9]]],Transpose[allavglist][[11]],Transpose[allavglist][[12]],Transpose[allavglist][[13]],Transpose[allavglist][[14]]}]];
+
+tmpphasedata=Sort[tmpphasedata,#1[[2]]<#2[[2]] &];
+
+Export["$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_rvl-phase-tmp.txt",tmpphasedata,"Table"];
+
 If[
 Mod[idir*100/lendirs,10]==0,
-Print[{MM,N[idir/lendirs],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs]}]]
+Print[{MM,N[idir/lendirs,2],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttimeD)/N[idir/lendirs]}]]
 ,{idir,1,lendirs}
 ];
 
