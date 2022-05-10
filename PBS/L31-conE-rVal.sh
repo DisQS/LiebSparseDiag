@@ -21,7 +21,7 @@ binary=LSDdiag.IC
 currdir=`pwd`
 jobdir=$currdir
 
-jobdir="RVL-L31-E$energy"
+jobdir="RSVL-L31-E$energy"
 mkdir -p $jobdir
 
 jobname=$jobdir-$configs-$dirs
@@ -253,7 +253,7 @@ SetDirectory[maindir];
 Export["$jobdir/RSstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_rvl.txt",allavglist,"Table"];
 Export["$jobdir/RSstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_rvl-phase.txt",phasedata,"Table"];
 
-(*Export["Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl-phase.csv",phasedata,"CSV"];*)
+(*Export["RSstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl-phase.csv",phasedata,"CSV"];*)
 
 ,
 {iMM,Length[MMlist]}
