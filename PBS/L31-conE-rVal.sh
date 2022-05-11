@@ -99,6 +99,7 @@ TarEng=ToExpression[StringDrop[TarEng,1]]/100.
 Print[{Directory[],TarEng,HubDis,RimDis}];
 
 allfiles=FileNames["EVal*.raw"];
+ClearAll[allenglist.allrlist.allslist.allstatslist.allstatrlist.allseeds];
 allenglist=allrlist=allslist=allstatslist=allstatrlist=allseeds={};
 ndone=0;
 
@@ -142,7 +143,7 @@ delta=DeleteCases[delta,x_/;x==0.];
 If[\$DBG,Print[delta]];
 
 (* Oganesyan r-values *)
-rlist={};
+ClearAll[rlist];rlist={};
 Do[
 rn=Min[delta[[ind]],delta[[ind-1]]]/Max[delta[[ind]],delta[[ind-1]]];
 If[\$DBG,Print[{ind,delta[[ind]],delta[[ind-1]],Min[delta[[ind]],delta[[ind-1]]],Max[delta[[ind]],delta[[ind-1]]],rn}]];
@@ -153,7 +154,7 @@ AppendTo[allrlist,rlist];
 AppendTo[allstatrlist,{Mean[rlist],StandardDeviation[rlist]/Sqrt[Length[rlist]]}];
 
 (* Shindou s-values *)
-slist=ncollec={};
+ClearAll[slist,ncollec]; slist=ncollec={};
 AppendTo[ncollec,{delta[[1]],delta[[1]]+delta[[2]]}]; (*first delta*)
 AppendTo[ncollec,{delta[[1]],delta[[2]],delta[[2]]+delta[[3]]}];(*second delta*)
 Do[           
