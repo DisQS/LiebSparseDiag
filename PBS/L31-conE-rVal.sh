@@ -99,7 +99,7 @@ TarEng=ToExpression[StringDrop[TarEng,1]]/100.
 Print[{Directory[],TarEng,HubDis,RimDis}];
 
 allfiles=FileNames["EVal*.raw"];
-ClearAll[allenglist.allrlist.allslist.allstatslist.allstatrlist.allseeds];
+ClearAll[allenglist,allrlist,allslist,allstatslist,allstatrlist,allseeds];
 allenglist=allrlist=allslist=allstatslist=allstatrlist=allseeds={};
 ndone=0;
 
