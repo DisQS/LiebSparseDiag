@@ -65,7 +65,7 @@ Print["(*Analysis*)"];
 
 
 SetDirectory[maindir];
-
+Print[maindir];
 
 Do[
 MM=MMlist[[iMM]];
