@@ -184,10 +184,14 @@ Print[{MM,N[idir/lendirs,2],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttim
 (* save all r and z values for each disorder *)
 Print[{Directory[],maindir<>"/$jobdir"}];
 fallrlist=Chop[N[Flatten[allrlist]]]; fallzlist=Chop[N[Flatten[allzlist]]];
-Do[PutAppend[fallrlist[[ind]],
+
+Export[maindir<>"/$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt",fallrlist,"Table"];
+Export[maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt",fallzlist,"Table"];
+
+(*Do[PutAppend[fallrlist[[ind]],
 maindir<>"/$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt"],{ind,Length[fallrlist]}];
 Do[PutAppend[fallzlist[[ind]],
-maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt"],{ind,Length[fallzlist]}];
+maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt"],{ind,Length[fallzlist]}];*)
 
 (* make analysis of mean/stddev moments *)
 
