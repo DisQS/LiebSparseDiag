@@ -75,7 +75,7 @@ SetDirectory[maindir];
 alldirs=FileNames["L"<>LL<>"-"<>MM<>"-*/L"<>LL<>"_M"<>MM<>"*"];
 Print[alldirs];
 
-allavglist={};
+allavglist=totalrlist=totalzlist={};
 
 starttimeD=AbsoluteTime[];
 lendirs=Min[maxdirs,Length[alldirs]];
@@ -181,6 +181,16 @@ Print[{MM,N[idir/lendirs,2],(AbsoluteTime[]-starttimeD),(AbsoluteTime[]-starttim
 ,{ifile,1,lensamples}
 ];
 
+(* save all r and z values for each disorder *)
+Print[{Directory[],maindir<>"/$jobdir"}];
+fallrlist=Chop[N[Flatten[allrlist]]]; fallzlist=Chop[N[Flatten[allzlist]]];
+Do[PutAppend[fallrlist[[ind]],
+maindir<>"/$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt"],{ind,Length[fallrlist]}];
+Do[PutAppend[fallzlist[[ind]],
+maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt"],{ind,Length[fallzlist]}];
+
+(* make analysis of mean/stddev moments *)
+
 maxbins=200;
 
 MeanEng=Mean[Flatten[allenglist]];
@@ -221,9 +231,7 @@ Export[rvlname,Flatten[allrlist],"Table"]
 ];
 
 tmpphasedata=Sort[Transpose[{Transpose[allavglist][[7]],Chop[Transpose[allavglist][[9]]],Transpose[allavglist][[11]],Transpose[allavglist][[12]],Transpose[allavglist][[13]],Transpose[allavglist][[14]]}]];
-
 tmpphasedata=Sort[tmpphasedata,#1[[2]]<#2[[2]] &];
-
 Export["$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_rvl-phase-tmp.txt",tmpphasedata,"Table"];
 
 If[
@@ -253,6 +261,7 @@ Transpose[allavglist][[18]]
 phasedata=Sort[phasedata,#1[[2]]<#2[[2]] &];
 
 SetDirectory[maindir];
+
 Export["$jobdir/RZstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_rvl.txt",allavglist,"Table"];
 Export["$jobdir/RZstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_rvl-phase.txt",phasedata,"Table"];
 
