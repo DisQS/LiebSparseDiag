@@ -190,13 +190,13 @@ fallrlist=Chop[N[Flatten[allrlist]]]; fallzlist=Chop[N[Flatten[allzlist]]];
 ];
 
 If[$comb>=1,
-Print[{"--- writing .txt file to ",maindir<>"/$jobdir"}];
+Print[{"--- writing NetCDF file to ",maindir<>"/$jobdir"}];
 Export[maindir<>"/$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.nc",fallrlist,"NetCDF"];
 Export[maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.nc",fallzlist,"NetCDF"];
 ];
 
 If[$comb>=2,
-Print[{"--- writing .nc files to ",maindir<>"/$jobdir"}];
+Print[{"--- writing .txt files to ",maindir<>"/$jobdir"}];
 Export[maindir<>"/$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt",fallrlist,"Table"];
 Export[maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt",fallzlist,"Table"];
 ];
