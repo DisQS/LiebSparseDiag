@@ -199,7 +199,7 @@ If[$comb>=2,
 Print[{"--- writing .nc files to ",maindir<>"/$jobdir"}];
 Export[maindir<>"/$jobdir/Rstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt",fallrlist,"Table"];
 Export[maindir<>"/$jobdir/Zstat_E"<>ToString[Floor[TarEng*10]]<>"_hD"<>ToString[Floor[HubDis*100]]<>"_M"<>MM<>If[$dirs!=0 || $configs!=0,"-$configs-$dirs",""]<>"_comb.txt",fallzlist,"Table"];
-]
+];
 
 (* make analysis of mean/stddev moments *)
 
