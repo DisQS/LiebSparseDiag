@@ -2,6 +2,9 @@
 (* ::Package:: *)
 
 (* ::Section:: *)
+(**)
+
+
 Print["(*Preliminaries*)"];
 
 $LOG=$DBG=$RVL=False;
@@ -28,6 +31,9 @@ Print[maindir];
 
 
 (* ::Section:: *)
+(**)
+
+
 Print["(*Analysis*)"];
 
 
@@ -65,7 +71,7 @@ TarEng=ToExpression[StringDrop[TarEng,1]]/100.
 Print[{Directory[](*,TarEng,HubDis,RimDis*)}];
 
 allfiles=FileNames["EVal*.raw"];
-allenglist=allrlist=allstatrlist=allseeds={};
+allenglist=allrlist=allstatrlist=allzlist=allstatzlist=allseeds={};
 ndone=0;
 
 starttime=AbsoluteTime[];
@@ -107,6 +113,7 @@ If[$DBG,Print[delta]];
 delta=DeleteCases[delta,x_/;x==0.];
 If[$DBG,Print[delta]];
 
+(* Oganesyan r-values *)
 rlist={};
 Do[
 rn=Min[delta[[ind]],delta[[ind-1]]]/Max[delta[[ind]],delta[[ind-1]]];
@@ -116,6 +123,35 @@ AppendTo[rlist,rn],
 ];
 AppendTo[allrlist,rlist];
 AppendTo[allstatrlist,{Mean[rlist],StandardDeviation[rlist]/Sqrt[Length[rlist]]}];
+
+(* Shindou z-values *)
+zlist=zcollec={};
+
+(* lower boundary *)
+AppendTo[zcollec,{delta[[1]],delta[[1]]+delta[[2]]}]; (*first delta*)
+AppendTo[zcollec,{delta[[1]],delta[[2]],delta[[2]]+delta[[3]]}];(*second delta*)
+
+(* bulk of data *)
+Do[           
+AppendTo[zcollec,{delta[[ind-2]]+delta[[ind-1]],delta[[ind-1]],delta[[ind]],delta[[ind]]+delta[[ind+1]]}];
+,{ind,3,Length[delta]-1}];
+
+(* upper boundary *)
+
+AppendTo[zcollec,{delta[[Length[delta]-2]]+delta[[Length[delta]-1]],delta[[Length[delta]-1]],delta[[Length[delta]]]}]; (*2nd to last delta*)
+AppendTo[zcollec,{delta[[Length[delta] - 1]] + delta[[Length[delta]]], delta[[Length[delta]]]}]; (*last delta*)
+
+If[$DBG,Print["ncolec=",zcollec]];
+
+Do[
+denn=Min[zcollec[[k]]];
+dennn=Min[DeleteCases[zcollec[[k]],denn]];
+sk=denn/dennn;
+If[$DBG,Print["sk=",sk]];
+AppendTo[zlist,sk],
+{k,1,Length[zcollec]}];
+AppendTo[allzlist,zlist];
+AppendTo[allstatzlist,{Mean[zlist],StandardDeviation[zlist]/Sqrt[Length[zlist]]}];
 
 If[
 Mod[ndone*100/lensamples,10]==0,
@@ -149,7 +185,11 @@ Chop[TarEng],MeanEng,MedianEng,Chop[HubDis],Chop[RimDis],
 Mean[Flatten[allrlist]],
 StandardDeviation[Flatten[allrlist]]/Sqrt[Length[Flatten[allrlist]]],
 Mean[Transpose[allstatrlist][[1]]],
-StandardDeviation[Transpose[allstatrlist][[1]]]/Sqrt[Length[Transpose[allstatrlist][[1]]]]
+StandardDeviation[Transpose[allstatrlist][[1]]]/Sqrt[Length[Transpose[allstatrlist][[1]]]],
+Mean[Flatten[allzlist]],
+StandardDeviation[Flatten[allzlist]]/Sqrt[Length[Flatten[allzlist]]],
+Mean[Transpose[allstatzlist][[1]]],
+StandardDeviation[Transpose[allstatzlist][[1]]]/Sqrt[Length[Transpose[allstatzlist][[1]]]]
 }];
 
 If[$RVL,
@@ -169,13 +209,24 @@ SetDirectory[maindir];
 
 (*Print[allavglist];*)
 
-phasedata=Sort[Transpose[{Transpose[allavglist][[7]],Chop[Transpose[allavglist][[9]]],Transpose[allavglist][[11]],Transpose[allavglist][[12]],Transpose[allavglist][[13]],Transpose[allavglist][[14]]}]];
+phasedata=Sort[Transpose[{
+Transpose[allavglist][[7]],
+Chop[Transpose[allavglist][[9]]],
+Transpose[allavglist][[11]],
+Transpose[allavglist][[12]],
+Transpose[allavglist][[13]],
+Transpose[allavglist][[14]],
+Transpose[allavglist][[15]],
+Transpose[allavglist][[16]],
+Transpose[allavglist][[17]],
+Transpose[allavglist][[18]]
+}]];
 
 phasedata=Sort[phasedata,#1[[2]]<#2[[2]] &];
 
 SetDirectory[maindir];
-Export["Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl.txt",allavglist,"Table"];
-Export["Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl-phase.txt",phasedata,"Table"];
+Export["RZstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl.txt",allavglist,"Table"];
+Export["RZstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl-phase.txt",phasedata,"Table"];
 
 (*Export["Rstat_E"<>ToString[Floor[TarEng*10]]<>"_M"<>MM<>"_rvl-phase.csv",phasedata,"CSV"];*)
 
