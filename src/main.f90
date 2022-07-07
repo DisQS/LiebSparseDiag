@@ -252,6 +252,10 @@ PROGRAM LiebJADdia
               !CALL genrand_int31(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed
               CALL SRANDOM5(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed)
               
+              ! ----------------------------------------------------------
+              ! ENTER random values into matrix
+              ! ----------------------------------------------------------
+              
               ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
               a_w(:) = a(:) 
               
@@ -352,6 +356,7 @@ PROGRAM LiebJADdia
 
               ! ----------------------------------------------------------
               !  call to PJD that computes eigenvalues & eigenvectors
+              ! ----------------------------------------------------------
 
               IF(IWriteFlag.GE.2) PRINT*,"main: calling PJD()"
               CALL PJD(Lsize, a_w, ja, ia, EIGS, RES, VECS, VECS_size, NEIG,&
