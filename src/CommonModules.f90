@@ -96,13 +96,13 @@ MODULE SETBINS
 
 CONTAINS
 
-  Subroutine SetbinsforJad(Dim, Nx, IWidth, HubDis, TarStore)
+  Subroutine SetbinsforJad(Dim, Nx, IWidth, CubeDis, TarStore)
 
     INTEGER(KIND=IKIND) Dim, Nx, IWidth, EnR
 
     INTEGER(KIND=IKIND) Nsum, Nflat, Ndisp, Nunit, k, I, IErr
 
-    REAL(KIND=RKIND) HubDis, EngRan
+    REAL(KIND=RKIND) CubeDis, EngRan
     INTEGER(KIND=IKIND),Dimension(:,:), ALLOCATABLE:: &
          TarStore
 
@@ -110,7 +110,7 @@ CONTAINS
     Nflat = (2*Nx)*(IWidth**Dim)
     Ndisp = Nsum - Nflat
 
-    EngRan = HubDis/2 + 1.0D0
+    EngRan = CubeDis/2 + 1.0D0
     EnR = INT(EngRan) + 1 ! +1 insured the eigenvalues are involved
 
 

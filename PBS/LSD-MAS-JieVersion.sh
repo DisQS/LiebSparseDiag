@@ -2,9 +2,9 @@
 
 # settings from input
 
-size=${1:-10}
+size=${1:-8}
 seed=${2:-1}
-config=${3:-100}
+config=${3:-2}
 keep=${4:-1}
 
 echo "LSD: making for M=" $size "with starting seed=" $seed "and" $config "samples"
@@ -38,7 +38,7 @@ cd $jobdir
 #do
 #    energy=4.0
 		
-for disorder in 15.0 14.0 13.0 12.0 11.0 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0 #30.0 29.0 28.0 27.0 26.0 25.0 24.0 23.0 22.0 21.0 20.0 19.0 18.0 17.0 16.0  # 
+for disorder in 15.0 14.0 #13.0 12.0 11.0 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0 #30.0 29.0 28.0 27.0 26.0 25.0 24.0 23.0 22.0 21.0 20.0 19.0 18.0 17.0 16.0  # 
 do
 
    #energy=`echo "$disorder + 6.0"| bc`
@@ -97,27 +97,29 @@ echo "create the input file"
 
 touch $inpfile
 
-echo "ISeed         = \$myseed       ">  $inpfile 
-echo "NConfig       = 1        ">>  $inpfile #
-echo "Dim           = 3            ">>  $inpfile 
-echo "Nx            = 1            ">>  $inpfile 
+echo "ISeed         = \$myseed      ">  $inpfile 
+echo "NConfig       = 1             ">>  $inpfile #
+echo "Dim           = 3             ">>  $inpfile 
+echo "Nx            = 1             ">>  $inpfile 
 echo "IBCFlag       = 1             ">>  $inpfile 
 echo "IRNGFlag      = 0             ">>  $inpfile 
-echo "IKeepFlag     = $keep      ">>  $inpfile 
-echo "IWriteFlag    = 2       ">>  $inpfile 
-echo "IStateFlag    = 0       ">>  $inpfile #
-echo "Width0        = $size       ">>  $inpfile 
-echo "Width1        = $size       ">>  $inpfile 
-echo "dWidth        = 2          ">>  $inpfile 
-echo "HubDis0       = $disorder      ">>  $inpfile 
-echo "HubDis1       = $disorder           ">>  $inpfile 
-echo "dHubDis       = 1.0           ">>  $inpfile 
-echo "RimDis0       = 0.0          ">>  $inpfile 
-echo "Energy0       = 1.0         ">>  $inpfile 
+echo "IKeepFlag     = $keep         ">>  $inpfile 
+echo "IWriteFlag    = 2             ">>  $inpfile 
+echo "IStateFlag    = 0             ">>  $inpfile #
+echo "Width0        = $size         ">>  $inpfile 
+echo "Width1        = $size         ">>  $inpfile 
+echo "dWidth        = 2             ">>  $inpfile 
+echo "CubeConstPoten= -10.0         ">>  $inpfile
+echo "CubeDis0      = $disorder     ">>  $inpfile 
+echo "CubeDis1      = $disorder     ">>  $inpfile 
+echo "dCubeDis      = 1.0           ">>  $inpfile 
+echo "LiebConstPoten= 0.0           ">>  $inpfile 
+echo "LiebDis       = 0.0           ">>  $inpfile 
+echo "Energy0       = 10.0          ">>  $inpfile 
 echo "Energy1       = $energy       ">>  $inpfile 
-echo "dEnergy       = 1.0        ">>  $inpfile 
-echo "NEvals        = 100           ">>  $inpfile 
-echo "Memory        = 100          ">>  $inpfile 
+echo "dEnergy       = 1.0           ">>  $inpfile 
+echo "NEvals        = 10            ">>  $inpfile 
+echo "Memory        = 100           ">>  $inpfile 
 
 cat $inpfile
 
