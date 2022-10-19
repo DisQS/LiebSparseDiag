@@ -13,8 +13,13 @@ $LOG=$DBG=$RVL=False;
 LL="31";
 
 MMlist={"10","12","14", "16", "18", "20", "22", "24"};
-MMlist=ReadList["!cat",Number];
+(*MMlist=ReadList["!cat",Number];*)
 (*MMlist = $ScriptInputString <> Import["!cat","String"]*)
+(*MMlist={ToExpression[InputString[]]};*)
+(*Print@Input[]
+MMlist={Input[]};*)
+
+Print[InputString[]];
 
 Print[MMlist];
 
