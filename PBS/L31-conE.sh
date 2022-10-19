@@ -22,8 +22,7 @@ jobdir=$currdir
 #binarydir=$HOME/Projects/LiebSparseDiag/EXE
 binarydir=/storage/disqs/LiebSparseDiag/EXE
 
-for disorder in 16.9 16.8 16.7 16.6 16.4 16.3 16.2 16.1
-#18.0 17.75 17.5 17.25 17.0 16.75 16.5 16.25 16.0 15.75 15.5 15.25 15.0
+for disorder in 15.85 15.9 15.95 16.0 16.05 16.1 16.15 16.2 16.25 16.3 16.35 16.4 16.45 16.5 16.55 16.6 16.65 16.7 16.75 16.8 16.85 16.9
 do
 
 #energy=`echo "$disorder/2.0 + 4.05"| bc`
@@ -95,19 +94,23 @@ echo "Memory        = 100          ">>  $inpfile #
 cat $inpfile
 
 $binarydir/$binary <$inpfile
+rm -f $inpfile
 
 done
 
-exit 0
+zip -m inp.zip *.inp
+#zip -m sh.zip *.sh
+
+#exit 0
 
 EOD
 
 chmod 755 ${jobfile}
-#(msub -q devel $jobdir/${jobfile}) # for queueing system
-#(sbatch -q devel $jobdir/${jobfile}) # for queueing system
-sbatch ${jobfile} # for queueing system
-#(source $jobdir/${jobfile} ) >& $jobdir/${logfile} & # for parallel shell execution
-#source ${jobfile} #>& ${logfile} # for sequential shell execution
+##(msub -q devel $jobdir/${jobfile}) # for queueing system
+##(sbatch -q devel $jobdir/${jobfile}) # for queueing system
+#sbatch ${jobfile} # for queueing system
+##(source $jobdir/${jobfile} ) >& $jobdir/${logfile} & # for parallel shell execution
+source ${jobfile} >& ${logfile} # for sequential shell execution
 
 #echo "<return>"
 sleep 1
