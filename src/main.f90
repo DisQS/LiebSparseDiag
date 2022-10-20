@@ -199,7 +199,7 @@ PROGRAM LiebJADdia
            
            PRINT*,"main: Energy=", Energy
 
-           CALL GetDirec(Dim, Nx, IWidth, CubeDis, LiebDis, CubeConstPoten, LiebConstPoten, Energy, str)
+           CALL GetDirec(Dim, Nx, IWidth, CubeDis, LiebDis, CubeConPot, LiebConPot, Energy, str)
            
            ! ----------------------------------------------------------
            ! start of ISeed loop
@@ -231,8 +231,8 @@ PROGRAM LiebJADdia
                  CALL SRANDOM5(ISSeed)
                  drandval=DRANDOM5(ISSeed)
                  WRITE(*, '(A7,I3,A4,F6.3,A4,F5.3,A16,F6.3,A16,F6.3,A3,F6.3,A3,I5,A4,F16.10)') &
-                      "IS: IW=", IWidth, " hD=", CubeDis, " rD=", LiebDis, " CubeConstPoten=", CubeConstPoten, &
-                      " LiebConstPoten=", LiebConstPoten, " E=", Energy, &
+                      "IS: IW=", IWidth, " hD=", CubeDis, " rD=", LiebDis, " CubeConPot=", CubeConPot, &
+                      " LiebConPot=", LiebConPot, " E=", Energy, &
                       " S=", Seed, " R=", drandval
                  PRINT*, "ISSeed=", ISSeed
               CASE DEFAULT
@@ -245,7 +245,7 @@ PROGRAM LiebJADdia
 
               SELECT CASE(IKeepFlag)
               CASE(1)
-                 CALL CheckOutput( Dim,Nx, IWidth, Energy, CubeDis, LiebDis, CubeConstPoten, LiebConstPoten,&
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, CubeDis, LiebDis, CubeConPot, LiebConPot,&
                       Seed, str, IErr )
                  IF(IErr.EQ.2) CYCLE
               END SELECT
@@ -262,14 +262,14 @@ PROGRAM LiebJADdia
                  k= (i-1)*(Nx*Dim+1) + 1
                  !CALL genrand_real1(drandval)
                  drandval= DRANDOM5(ISSeed)
-                 a_w(ia(k)) = CubeConstPoten + CubeDis*(drandval - 0.5D0)
+                 a_w(ia(k)) = CubeConPot + CubeDis*(drandval - 0.5D0)
                  
                  DO j=2, (Nx*Dim +1)
                     
                     k = (i-1)*(Nx*Dim+1) + j
                     !CALL genrand_real1(drandval)
                     drandval= DRANDOM5(ISSeed)
-                    a_w(ia(k)) = LiebConstPoten + LiebDis*(drandval - 0.5D0)
+                    a_w(ia(k)) = LiebConPot + LiebDis*(drandval - 0.5D0)
                     
                  END DO
                  
@@ -381,13 +381,13 @@ PROGRAM LiebJADdia
               ELSE
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-                      IWidth, Energy, CubeDis, LiebDis, CubeConstPoten, LiebConstPoten, Seed, str, IErr)
+                      IWidth, Energy, CubeDis, LiebDis, CubeConPot, LiebConPot, Seed, str, IErr)
                  IF(IStateFlag.NE.0)THEN
                     PRINT*,"main: PJD() found eigenvectors, these will now be saved into file"
                     DO Inum= 1,NEIG
                        Call WriteOutputEVec(Dim, Nx, Inum, NEIG, Lsize, &
                             VECS, VECS_size, IWidth, Energy, CubeDis, & 
-                            LiebDis, CubeConstPoten, LiebConstPoten, Seed, str, IErr)
+                            LiebDis, CubeConPot, LiebConPot, Seed, str, IErr)
                     END DO
                  END IF !IStateFlag IF
               END IF
