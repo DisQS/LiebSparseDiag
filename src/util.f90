@@ -76,8 +76,8 @@ SUBROUTINE MakeCompactRowLiebMat(Dim, Nx, M, LSize, CSize, iao, jao, ao, nz )
      DO indhop=1,2*Dim
         IF(ap(indhop).GT.ind)THEN
            ElementsPut = ElementsPut + 1 
-           CALL RANDOM_NUMBER(ao(ElementsPut)) 
-           ao(ElementsPut) = ao(ElementsPut) + 0.5D0     ! Store the hopping energy    ! Store the hopping energy
+           CALL RANDOM_NUMBER(ao(ElementsPut))
+           ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy
            jao(ElementsPut-1) = ap(indhop)   ! Store the position of hopping energy
         END IF
      END DO
@@ -111,7 +111,7 @@ SUBROUTINE MakeCompactRowLiebMat(Dim, Nx, M, LSize, CSize, iao, jao, ao, nz )
                  IF(bp(indhop).GT.ind)THEN
                     ElementsPut = ElementsPut + 1 
                     CALL RANDOM_NUMBER(ao(ElementsPut))
-                    ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy    ! Store the hopping energy
+                    ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy
                     jao(ElementsPut-1) = bp(indhop)   ! Store the position of hopping energy
                  END IF
               END DO
@@ -154,7 +154,7 @@ SUBROUTINE MakeCompactRowLiebMat(Dim, Nx, M, LSize, CSize, iao, jao, ao, nz )
               IF(bp(indhop).GT.ind)THEN
                  ElementsPut = ElementsPut + 1 
                  CALL RANDOM_NUMBER(ao(ElementsPut))
-                 ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy    ! Store the hopping energy
+                 ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy
                  jao(ElementsPut-1) = bp(indhop)   ! Store the position of hopping energy
               END IF
            END DO
@@ -199,7 +199,7 @@ SUBROUTINE MakeCompactRowLiebMat(Dim, Nx, M, LSize, CSize, iao, jao, ao, nz )
               IF(bp(indhop).GT.ind)THEN
                  ElementsPut = ElementsPut + 1 
                  CALL RANDOM_NUMBER(ao(ElementsPut))
-                 ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy    ! Store the hopping energy
+                 ao(ElementsPut) = ao(ElementsPut) + 0.5D0    ! Store the hopping energy
                  jao(ElementsPut-1) = bp(indhop)   ! Store the position of hopping energy
               END IF
            END DO

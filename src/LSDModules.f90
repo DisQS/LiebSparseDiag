@@ -66,9 +66,9 @@
 
 !!--------------------------------------------------------------------
 MODULE CConstants
-  CHARACTER*18, PARAMETER :: RStr= "$Revision: 1.0 $ "
-  CHARACTER*30, PARAMETER :: DStr= "$Date: 2021/08 $ "
-  CHARACTER*16, PARAMETER :: AStr= "$Author: phsht $ "
+  CHARACTER*18, PARAMETER :: RStr= "$Revision: 1.3 $ "
+  CHARACTER*30, PARAMETER :: DStr= "$Date: 2007/09/25 20:45:08 $ "
+  CHARACTER*16, PARAMETER :: AStr= "$Author: phrfar $ "
 END MODULE CConstants
 
 !! MAXGamma needs to be equal to MAXWidth, as we need to find ALL
@@ -84,9 +84,9 @@ END MODULE IConstants
 !!--------------------------------------------------------------------
 MODULE IPara
   USE MyNumbers
-  INTEGER(KIND=IKIND) :: ISeed, NConfig, Seed, NEvals
+  INTEGER(KIND=IKIND) :: ISeed, NSeed, Seed, NEvals
   INTEGER(KIND=IKIND) :: Dim, Nx
-  INTEGER(KIND=IKIND) :: Width0, Width1, dWidth, IKeepFlag, IWriteFlag, ISortFlag, IStateFlag
+  INTEGER(KIND=IKIND) :: Width0, Width1, dWidth, IKeepFlag, IWriteFlag, ISortFlag
   INTEGER(KIND=IKIND) :: IFluxFlag, IBCFlag, IRNGFlag, ILevelFlag, IConvFlag
   INTEGER(KIND=IKIND) :: IStripeFlag, IDimenFlag
 END MODULE IPara
