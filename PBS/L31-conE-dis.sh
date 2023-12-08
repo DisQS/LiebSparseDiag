@@ -4,11 +4,12 @@
 
 energy=${1:-1.0}
 size=${2:-10}
-seed=${3:-1}
-config=${4:-2}
-keep=${5:-1}
+disorder0=${3:-1.0}
+seed=${4:-1}
+config=${5:-2}
+keep=${6:-1}
 
-echo "LSD: making for E=" $energy "with M=" $size "and starting seed=" $seed "and" $config "samples"
+echo "LSD: making for E=" $energy "with M=" $size " DISORDER=" $disorder0 "and starting seed=" $seed "and" $config "samples"
 
 # settings for files
 
@@ -22,7 +23,7 @@ jobdir=$currdir
 #binarydir=$HOME/Projects/LiebSparseDiag/EXE
 binarydir=/storage/disqs/LiebSparseDiag/EXE
 
-for disorder in 15.85 15.9 15.95 16.0 16.05 16.1 16.15 16.2 16.25 16.3 16.35 16.4 16.45 16.5 16.55 16.6 16.65 16.7 16.75 16.8 16.85 16.9
+for disorder in $disorder0
 do
 
 #energy=`echo "$disorder/2.0 + 4.05"| bc`
