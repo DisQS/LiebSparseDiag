@@ -6,8 +6,6 @@
 !                  roemer's makeanderson matrix             
 !                           converted from base 0 to base 1 
 ! ----------------------------------------------------------
-!
-! ----------------------------------------------------------
 
 PROGRAM LiebJADdia
 
@@ -17,7 +15,8 @@ PROGRAM LiebJADdia
   USE IPara
   USE DPara
   USE IChannels
-  USE RNG
+  USE RNG_MT
+  USE mt95
   USE SETBINS
   !USE RConstants					   
   !USE EigenPara
@@ -31,9 +30,9 @@ PROGRAM LiebJADdia
   ! ----------------------------------------------------------
 
   ! Parameters for Lieb matrix
-  INTEGER(KIND=IKIND) IWidth
+  INTEGER(KIND=IKIND) IWidth, ISSeed(5)
   
-  INTEGER(KIND=IKIND) i, j, k, LSize, CSize
+  INTEGER(KIND=IKIND) i, j, k, LSize, CSize, LARGE
        
   ! arguments to pass to the JD routine
   INTEGER(KIND=IKIND) &
@@ -41,10 +40,10 @@ PROGRAM LiebJADdia
        ITER, IPRINT, INFO, IJOB, NDX1, NDX2, IErr, sumIErr, maxsp, &
        VECS_size       ! optimal workspace (N.B.: here, maxsp*maxsp>maxeig)
 
-  PARAMETER (maxsp=20)
+  PARAMETER (maxsp=20, LARGE=2147483647)
 
   REAL(KIND=RKIND) &
-       SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL
+       SIGMA, TOL, DELTA, SHIFT, GAP, MEM, DROPTOL, drandval
 
   ! output arguments from the Lieb routine
   INTEGER(KIND=IKIND) nz
@@ -61,48 +60,58 @@ PROGRAM LiebJADdia
        RES,&   !computed residues: |Ax-EIGS x|
        VECS, &    !computed eigenvectors
        a,a_w
-
+  
   INTEGER(KIND=IKIND), DIMENSION(:), ALLOCATABLE:: &
        ia, ja
-
+  
   ! some local variables
   INTEGER(KIND=IKIND)  i1, i2, i3, Inum
+  
+  REAL(KIND=RKIND) SugTarE
+  CHARACTER*100 str
+  
+  !  REAL(KIND=RKIND), DIMENSION(:,:), ALLOCATABLE::mat
+  
+  !  Character*68 Matrixname
 
-  REAL(KIND=RKIND), DIMENSION(:,:), ALLOCATABLE::mat
-
-  Character*58 Matrixname
-
-  ! Setting Target Energy
-
-  INTEGER(KIND=IKIND) L
-
-  INTEGER(KIND=IKIND), Dimension(:,:), ALLOCATABLE:: TarStore
-
+!!$  ! Setting Target Energy
+!!$
+!!$  INTEGER(KIND=IKIND) L
+!!$
+!!$  INTEGER(KIND=IKIND), Dimension(:,:), ALLOCATABLE:: TarStore
+  
   ! ----------------------------------------------------------
   ! start of main code
   ! ----------------------------------------------------------
-
+  
   ! ----------------------------------------------------------
-  ! protocol feature
+  ! protocol feature via git
+  ! set: git tag -a v0.0 -m 'Version 0.0'
   ! ----------------------------------------------------------
-
-  PRINT*,"LiebSparseDiag ", RStr, DStr, AStr 
-
+#ifdef git
+  PRINT*,"LiebSparseDiag (", TRIM("GITVERSION"), ")"
+#else
+  PRINT*,"LiebSparseDiag()"
+#endif
+  
   ! ----------------------------------------------------------
   ! inout handling
   ! ----------------------------------------------------------
 
+  PRINT*,"main: calling Input()"
   CALL  Input(IErr)
   IF(IErr.NE.0) THEN
      PRINT*,"main: Input() finds IErr=", IErr
      STOP
   ENDIF
-
+  
   ! ----------------------------------------------------------
   ! start of main IWidth loop
   ! ----------------------------------------------------------
-
+  
   DO IWidth= Width0, Width1, dWidth
+  
+       PRINT*,"main: IWidth=", IWidth
 
      ! ----------------------------------------------------------
      IF(IWriteFlag.GE.0) THEN
@@ -115,7 +124,7 @@ PROGRAM LiebJADdia
      
      LSize     = (Dim*Nx+1)*(IWidth**Dim)
      VECS_size = Lsize*(3*maxsp+NEVals+1)+4*maxsp*maxsp
-     CSize=(2*Dim*Nx+4)*(IWidth**Dim) 
+     CSize     = (2*Dim*Nx+Dim+1)*(IWidth**Dim) 
      
      IF(IWriteFlag.GE.2) THEN
         PRINT*,"main: cube is ",Lsize," by ",Lsize
@@ -127,8 +136,8 @@ PROGRAM LiebJADdia
      ! ----------------------------------------------------------
      
      sumIErr= 0
-!!$     ALLOCATE(EIGS(NEVals), STAT=IErr); sumIErr=sumIErr+IErr
-!!$     ALLOCATE(RES(NEVals), STAT=IErr); sumIErr=sumIErr+IErr
+     ALLOCATE(EIGS(NEVals), STAT=IErr); sumIErr=sumIErr+IErr
+     ALLOCATE(RES(NEVals), STAT=IErr); sumIErr=sumIErr+IErr
      ALLOCATE(VECS(VECS_size), STAT=IErr); sumIErr=sumIErr+IErr
      ALLOCATE(ao(0:CSize), STAT=IErr); sumIErr=sumIErr+IErr
      ALLOCATE(iao(0:LSize), STAT=IErr); sumIErr=sumIErr+IErr
@@ -137,21 +146,23 @@ PROGRAM LiebJADdia
      ALLOCATE(a_w(CSize), STAT=IErr); sumIErr=sumIErr+IErr
      ALLOCATE(ia(LSize+1), STAT=IErr); sumIErr=sumIErr+IErr
      ALLOCATE(ja(CSize), STAT=IErr); sumIErr=sumIErr+IErr
-     ALLOCATE(mat(LSize,LSize), STAT=IErr); sumIErr=sumIErr+IErr
      
      IF(IErr.NE.0) THEN
         PRINT*,"main: Input() finds sumIErr=", sumIErr
         STOP
      ENDIF
      
-
      ! ----------------------------------------------------------
      ! making the Lieb matrix
      ! ----------------------------------------------------------
-     
+
+     PRINT*,"main: calling MakeCompactRowLiebMat()"
      CALL MakeCompactRowLiebMat(Dim, Nx, IWidth, LSize, CSize, iao, jao, ao, nz )
      !output NZ = # of nonzero and diagonal elements
      !output ia must have size of N+1
+
+     IF(IWriteFlag.GE.4) PRINT*,&
+          "main: There are",nz,"nonzero elements of array a()"
 
      ! ----------------------------------------------------------
      ! converting arrays from base 0 to base 1
@@ -161,61 +172,112 @@ PROGRAM LiebJADdia
         ja(i)=jao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,ja(i)
      ENDDO
-
+     
      DO i=1,nz
         a(i)=ao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,a(i)
      ENDDO
-
+     
      DO i=1,Lsize+1
         ia(i)=iao(i-1)
 !!$           IF(IWriteFlag.GE.4) PRINT*,i,ia(i)
      ENDDO
-
-     ! ----------------------------------------------------------
-     ! start of DiagDis loop
-     ! ----------------------------------------------------------
      
-     DO DiagDis= DiagDis0,DiagDis1,dDiagDis
-        
-        ! Insure the DiagDis is large than RimDiagDis
-        CALL SetbinsforJad(Dim, Nx, IWidth, DiagDis, TarStore)
+     ! -----------------------------------------------------------------
+     ! start of HubDis loop, not finished yet, just keep HubDis0= HubDis1
+     ! -----------------------------------------------------------------
        
+     DO HubDis= HubDis0, HubDis1 + dHubDis/2.0, dHubDis
+    
+        PRINT*,"main: HubDis=", HubDis
 
-        DO Seed= ISeed, ISeed+ NSeed -1
-
-           IF(IWriteFlag.GE.1) THEN
-              PRINT*, "  DiagDis=", DiagDis, " Seed=", Seed
-           ENDIF
-
-           IF(IWriteFlag.GE.4) PRINT*,&
-                "main: There are",nz,"nonzero elements of array a()"
-
-           CALL SRANDOM(Seed)
-
-           ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
-           a_w(:) = a(:) 
-
-           ! Give the Lieb matrix different onsite potensial
-           DO i=1, IWidth**Dim
-
-              k= (i-1)*(Nx*Dim+1) + 1
-              a_w(ia(k)) = DiagDis*(DRANDOM(Seed) - 0.5D0)
-
-
-              DO j=2, (Nx*Dim +1)
-
-                 k = (i-1)*(Nx*Dim+1) + j
-                 a_w(ia(k)) = RimDiagDis*(DRANDOM(Seed) - 0.5D0)
-
-              END DO
-
-           END DO
-                   
-           !---------------------------------------------------------
-           ! Transform the format of Sparse matrix to Full matrix
-           !--------------------------------------------------------
+        ! ----------------------------------------------------------
+        ! start of Energy loop
+        ! ----------------------------------------------------------
+        
+        DO Energy= Energy0, Energy1 + dEnergy/2.0, dEnergy
            
+           PRINT*,"main: Energy=", Energy
+
+           CALL GetDirec(Dim, Nx, IWidth, HubDis, RimDis, Energy, str)
+           
+           ! ----------------------------------------------------------
+           ! start of ISeed loop
+           ! ----------------------------------------------------------
+           
+           DO Seed= ISeed, ISeed+ NConfig -1
+              
+              ! ----------------------------------------------------------
+              ! Compute actual seed
+              ! ----------------------------------------------------------
+
+              ISSeed(1)= Seed
+              ISSeed(2)= IWidth
+              ISSeed(3)= NINT(Energy*1000.)
+              ISSeed(4)= NINT(HubDis*1000.)
+              ISSeed(5)= NINT(RimDis*1000.)
+
+!              CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
+
+              SELECT CASE(IWriteFlag)
+              CASE(1,2)
+                 PRINT*, "-- Seed=", Seed
+                 PRINT*, "-> ISSeed=", ISSeed
+              CASE(3,4)
+!!$                 PRINT*, "IS: IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
+!!$                      "S=", Seed, "IS=", ISSeed
+                 CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
+                 CALL genrand_real1(drandval)
+                 CALL SRANDOM5(ISSeed)
+                 drandval=DRANDOM5(ISSeed)
+                 WRITE(*, '(A7,I3,A4,F6.3,A4,F5.3,A3,F6.3,A3,I5,A4,F16.10)') &
+                      "IS: IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
+                      " S=", Seed, " R=", drandval
+                 PRINT*, "ISSeed=", ISSeed
+              CASE DEFAULT
+                 PRINT*,"main: Seed=", Seed
+              END SELECT              
+
+              ! ----------------------------------------------------------
+              ! CHECK if same exists and can be overwritten
+              ! ----------------------------------------------------------
+
+              SELECT CASE(IKeepFlag)
+              CASE(1)
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, &
+                      Seed, str, IErr )
+                 IF(IErr.EQ.2) CYCLE
+              END SELECT
+              
+              !CALL genrand_int31(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed
+              CALL SRANDOM5(ISSeed) ! MT95 with 5 seeds, before: CALL SRANDOM(ISSeed)
+              
+              ! keep array a Lieb matrix form, for each disorder circle, only change the a_w
+              a_w(:) = a(:) 
+              
+              ! Give the Lieb matrix different onsite potensial
+              DO i=1, IWidth**Dim
+                 
+                 k= (i-1)*(Nx*Dim+1) + 1
+                 !CALL genrand_real1(drandval)
+                 drandval= DRANDOM5(ISSeed)
+                 a_w(ia(k)) = HubDis*(drandval - 0.5D0)
+                 
+                 DO j=2, (Nx*Dim +1)
+                    
+                    k = (i-1)*(Nx*Dim+1) + j
+                    !CALL genrand_real1(drandval)
+                    drandval= DRANDOM5(ISSeed)
+                    a_w(ia(k)) = RimDis*(drandval - 0.5D0)
+                    
+                 END DO
+                 
+              END DO
+           
+              !---------------------------------------------------------
+              ! Transform the format of Sparse matrix to Full matrix
+              !--------------------------------------------------------
+              
 !!$           mat(:,:)=0.0D0
 !!$           DO i=1, LSize ! the horizontal of matrix
 !!$
@@ -247,38 +309,21 @@ PROGRAM LiebJADdia
 !!$
 !!$           CLOSE(10)
 
-           DO L= Size(TarStore,dim=1)/2+1, Size(TarStore,dim=1) !TargetEnergy Cycle
-
-              Energy = REAL( TarStore(L,1) )
-              NEVals = TarStore(L,2)
-
-              sumIErr= 0
-              ALLOCATE( EIGS(NEVals), STAT=IErr ); sumIErr=sumIErr+IErr
-              ALLOCATE( RES(NEVals) ); sumIErr=sumIErr+IErr
-
-              IF(IErr.NE.0) THEN
-                 PRINT*,"main: Allocate() finds sumIErr=", sumIErr
-                 STOP
-              ENDIF
-
-!!$              Print*, "Energy= ", Energy, " NeVals= ", NEVals
-              Print*, "TarStore(1)= ", REAL(TarStore(L,1)), " TarStore(2)= ", TarStore(L,2) 
-
               ! ----------------------------------------------------------
               ! interface to the JADAMILU code
               ! ----------------------------------------------------------
               ! the matrix is already in the required format
-              
+
               ! standard report on standard output
               IPRINT=6
 
               ! we want the eigenvalues near target sigma=0         
               ! (then, SHIFT need not to be set)       
-              ISEARCH=2
+              ISEARCH=2      
               SIGMA=Energy
-             
+                             
               ! elbow space factor for the fill computed during the ILU
-              MEM=20.0
+              MEM=200.0 !Memory
               ! tolerence for discarded fill
               DROPTOL=1.d-3
 
@@ -290,10 +335,10 @@ PROGRAM LiebJADdia
               ! desired size of the search space
               MADSPACE=maxsp
               ! maximum number of iteration steps
-              ITER=1000
+              ITER=20000
               ! tolerance for the eigenvector residual
               TOL=1.0d-10
-
+              
               ! additional parameters set to default
               ICNTL(1)=0
               ICNTL(2)=0    ! switch ON for ADAPTIVE precon =0
@@ -301,74 +346,68 @@ PROGRAM LiebJADdia
               ICNTL(4)=0
               ICNTL(5)=0
 
+!!$              RES=0
+!!$              VECS=0
+!!$              EIGS=0
+
               ! ----------------------------------------------------------
               !  call to PJD that computes eigenvalues & eigenvectors
 
-              IF(IWriteFlag.GE.4) PRINT*,"main: calling PJD()"
+              IF(IWriteFlag.GE.2) PRINT*,"main: calling PJD()"
               CALL PJD(Lsize, a_w, ja, ia, EIGS, RES, VECS, VECS_size, NEIG,&
                    SIGMA, ISEARCH, NINIT, MADSPACE, ITER, TOL,&
                    SHIFT, DROPTOL, MEM, ICNTL,&
                    IPRINT, INFO, GAP)
 
+              ! We set a large NEvals to guarantee get all eigenvalues at a certain droptol
+              ! When it get the number of eigenvalues is less than NEvals which we set,
+              ! it will return the actually number INFO(which included one unconverged)
+              IF(INFO.NE.0) THEN
+                 NEIG= INFO - 1
+              END IF
 
-              !  CALL PJDCLEANUP   !to be used if you want a new preconditioner in every iteration
+              !to be used if you want a new preconditioner in every iteration
+              CALL PJDCLEANUP   
 
               ! ----------------------------------------------------------
               ! write results into files
               ! ---------------------------------------------------------
-
-
-           DO i=1, NEVals
-              PRINT*, i, EIGS(i)
-           END DO
-
-           
-           SELECT CASE(IKeepFlag)
-
-           CASE(0)
-              CALL WriteOutputEVal( NEVals, EIGS, IWidth, Energy, DiagDis, RimDiagDis, Seed, IErr)
-              DO Inum=1,NEVals
-!!$                 CALL WriteOutputEVec( Inum, NEVals, Lsize, VECS, VECS_size, &
-!!$                      IWidth, Energy, DiagDis, RimDiagDis, Seed, IErr)
-              ENDDO
-
-           CASE(1)           
-              CALL CheckOutput( IWidth, Energy, DiagDis, RimDiagDis, Seed, IErr )
-              IF(IErr.EQ.2) GOTO 100
-              CALL WriteOutputEVal(NEVals, EIGS, IWidth, Energy, DiagDis, RimDiagDis, Seed, IErr,IKeepFlag)
-              DO Inum=1,NEVals
-                 CALL WriteOutputEVec( Inum, NEVals, Lsize, VECS, VECS_size, &
-                      IWidth, Energy, DiagDis, RimDiagDis, Seed, IErr)
-              ENDDO
-
-100        END SELECT
-
-           DEALLOCATE( EIGS, RES, STAT=IErr )
-           IF(IErr.NE.0) THEN
-              PRINT*,"main: DEALLOCATE() finds IErr=", IErr
-              !STOP
-           ENDIF
               
-        END DO !TargetEnergy cycle
-
-
-        END DO  ! Seed
-     ENDDO ! DiagDis loop
-
-
+              IF(NEIG==0)THEN
+                 PRINT*,"main: PJD() did not find any eigenvalues!"
+              ELSE IF(NEIG.LT.0)THEN
+                 PRINT*,"main: PJD() reported ERROR: #", NEIG
+              ELSE
+                 PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
+                 CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
+                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+                 IF(IStateFlag.NE.0)THEN
+                    PRINT*,"main: PJD() found eigenvectors, these will now be saved into file"
+                    DO Inum= 1,NEIG
+                       Call WriteOutputEVec(Dim, Nx, Inum, NEIG, Lsize, &
+                            VECS, VECS_size, IWidth, Energy, HubDis, & 
+                            RimDis, Seed, str, IErr)
+                    END DO
+                 END IF !IStateFlag IF
+              END IF
+              
+           END DO !Seed loop
+           
+        END DO !Energy loop
+        
+     END DO !HubDis loop
      
      ! ----------------------------------------------------------
      ! DEALLOCATE memory
      
-!!$     DEALLOCATE(EIGS,RES,VECS,ia,iao,ja,jao,a,a_w,ao,mat,STAT=IErr)
-     DEALLOCATE(VECS,ia,iao,ja,jao,a,a_w,ao,mat,STAT=IErr)
+     DEALLOCATE(EIGS,RES,VECS,ia,iao,ja,jao,a,a_w,ao,STAT=IErr)
      
      IF(IErr.NE.0) THEN
         PRINT*,"main: DEALLOCATE() finds IErr=", IErr
         !STOP
      ENDIF
 
-  ENDDO ! Width loop
+  END DO ! Width loop
   
 END PROGRAM LiebJADdia   !main program
 

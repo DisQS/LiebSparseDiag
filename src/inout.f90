@@ -276,20 +276,15 @@ SUBROUTINE CheckOutput( Dim, Nx, IWidth, Energy, HubDis, RimDis, PreSeed, str, I
   ENDIF
   
   OPEN(UNIT= IChOut, ERR= 10, STATUS= 'NEW', FILE= TRIM(ADJUSTL(str))//"/"//FileName)
-  !PRINT*, "CheckOutput(): ", TRIM(FileName), "DOES NOT exist -- proceeding!"
-  WRITE(*,'(A16,A54,A31)') "CheckOutput(): ", &
-       TRIM(FileName), " DOES NOT exist -- proceeding!"
-
+  
   IErr= 0
   
 20 CLOSE(UNIT= IChOut, ERR= 100)
   
   RETURN
   
-10 WRITE(*,'(A16,A54,A22)') "CheckOutput(): ", &
-        TRIM(FileName), " exists -- skipping!"
-
-  !PRINT*, "CheckOutput(): ", TRIM(FileName), " exists -- skipping!"
+10 PRINT*, "CheckOutput(): ", TRIM(FileName)
+  PRINT*,  "CheckOutput(): exists -- skipped!"
   IErr= 2
   GOTO 20
   
