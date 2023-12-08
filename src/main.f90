@@ -184,12 +184,12 @@ PROGRAM LiebJADdia
      ENDDO
      
      ! -----------------------------------------------------------------
-     ! start of HubDis loop, not finished yet, just keep HubDis0= HubDis1
+     ! start of CubeDis loop, not finished yet, just keep CubeDis0= CubeDis1
      ! -----------------------------------------------------------------
        
-     DO HubDis= HubDis0, HubDis1 + dHubDis/2.0, dHubDis
+     DO CubeDis= CubeDis0, CubeDis1 + dCubeDis/2.0, dCubeDis
     
-        PRINT*,"main: HubDis=", HubDis
+        PRINT*,"main: CubeDis=", CubeDis
 
         ! ----------------------------------------------------------
         ! start of Energy loop
@@ -199,7 +199,7 @@ PROGRAM LiebJADdia
            
            PRINT*,"main: Energy=", Energy
 
-           CALL GetDirec(Dim, Nx, IWidth, HubDis, RimDis, Energy, str)
+           CALL GetDirec(Dim, Nx, IWidth, CubeDis, LiebDis, CubeConPot, LiebConPot, Energy, str)
            
            ! ----------------------------------------------------------
            ! start of ISeed loop
@@ -214,8 +214,8 @@ PROGRAM LiebJADdia
               ISSeed(1)= Seed
               ISSeed(2)= IWidth
               ISSeed(3)= NINT(Energy*1000.)
-              ISSeed(4)= NINT(HubDis*1000.)
-              ISSeed(5)= NINT(RimDis*1000.)
+              ISSeed(4)= NINT(CubeDis*1000.)
+              ISSeed(5)= NINT(LiebDis*1000.)
 
 !              CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
 
@@ -224,14 +224,15 @@ PROGRAM LiebJADdia
                  PRINT*, "-- Seed=", Seed
                  PRINT*, "-> ISSeed=", ISSeed
               CASE(3,4)
-!!$                 PRINT*, "IS: IW=", IWidth, "hD=", NINT(HubDis*1000.), "E=", NINT(Energy*1000.), &
+!!$                 PRINT*, "IS: IW=", IWidth, "hD=", NINT(CubeDis*1000.), "E=", NINT(Energy*1000.), &
 !!$                      "S=", Seed, "IS=", ISSeed
                  CALL genrand_int31(ISSeed) ! MT95 with 5 seeds
                  CALL genrand_real1(drandval)
                  CALL SRANDOM5(ISSeed)
                  drandval=DRANDOM5(ISSeed)
-                 WRITE(*, '(A7,I3,A4,F6.3,A4,F5.3,A3,F6.3,A3,I5,A4,F16.10)') &
-                      "IS: IW=", IWidth, " hD=", HubDis, " rD=", RimDis, " E=", Energy, &
+                 WRITE(*, '(A7,I3,A4,F6.3,A4,F5.3,A16,F6.3,A16,F6.3,A3,F6.3,A3,I5,A4,F16.10)') &
+                      "IS: IW=", IWidth, " hD=", CubeDis, " rD=", LiebDis, " CubeConPot=", CubeConPot, &
+                      " LiebConPot=", LiebConPot, " E=", Energy, &
                       " S=", Seed, " R=", drandval
                  PRINT*, "ISSeed=", ISSeed
               CASE DEFAULT
@@ -244,7 +245,7 @@ PROGRAM LiebJADdia
 
               SELECT CASE(IKeepFlag)
               CASE(1)
-                 CALL CheckOutput( Dim,Nx, IWidth, Energy, HubDis, RimDis, &
+                 CALL CheckOutput( Dim,Nx, IWidth, Energy, CubeDis, LiebDis, CubeConPot, LiebConPot,&
                       Seed, str, IErr )
                  IF(IErr.EQ.2) CYCLE
               END SELECT
@@ -261,14 +262,14 @@ PROGRAM LiebJADdia
                  k= (i-1)*(Nx*Dim+1) + 1
                  !CALL genrand_real1(drandval)
                  drandval= DRANDOM5(ISSeed)
-                 a_w(ia(k)) = HubDis*(drandval - 0.5D0)
+                 a_w(ia(k)) = CubeConPot + CubeDis*(drandval - 0.5D0)
                  
                  DO j=2, (Nx*Dim +1)
                     
                     k = (i-1)*(Nx*Dim+1) + j
                     !CALL genrand_real1(drandval)
                     drandval= DRANDOM5(ISSeed)
-                    a_w(ia(k)) = RimDis*(drandval - 0.5D0)
+                    a_w(ia(k)) = LiebConPot + LiebDis*(drandval - 0.5D0)
                     
                  END DO
                  
@@ -380,13 +381,13 @@ PROGRAM LiebJADdia
               ELSE
                  PRINT*,"main: PJD() found eigenvalues, these will now be saved into file"
                  CALL WriteOutputEVal( Dim, Nx, NEIG, EIGS, &
-                      IWidth, Energy, HubDis, RimDis, Seed, str, IErr)
+                      IWidth, Energy, CubeDis, LiebDis, CubeConPot, LiebConPot, Seed, str, IErr)
                  IF(IStateFlag.NE.0)THEN
                     PRINT*,"main: PJD() found eigenvectors, these will now be saved into file"
                     DO Inum= 1,NEIG
                        Call WriteOutputEVec(Dim, Nx, Inum, NEIG, Lsize, &
-                            VECS, VECS_size, IWidth, Energy, HubDis, & 
-                            RimDis, Seed, str, IErr)
+                            VECS, VECS_size, IWidth, Energy, CubeDis, & 
+                            LiebDis, CubeConPot, LiebConPot, Seed, str, IErr)
                     END DO
                  END IF !IStateFlag IF
               END IF
@@ -395,7 +396,7 @@ PROGRAM LiebJADdia
            
         END DO !Energy loop
         
-     END DO !HubDis loop
+     END DO !CubeDis loop
      
      ! ----------------------------------------------------------
      ! DEALLOCATE memory
