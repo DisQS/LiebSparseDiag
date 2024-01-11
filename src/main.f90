@@ -89,7 +89,8 @@ PROGRAM LiebJADdia
   ! set: git tag -a v0.0 -m 'Version 0.0'
   ! ----------------------------------------------------------
 #ifdef git
-  PRINT*,"LiebSparseDiag (", TRIM("GITVERSION"), ")"
+  PRINT*,"LiebExactDiag ", TRIM("GITVERSION"), ", ", &
+       TRIM("GITBRANCH"), ", compiled: ", TRIM("COMPILED")
 #else
   PRINT*,"LiebSparseDiag()"
 #endif
